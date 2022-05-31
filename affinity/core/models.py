@@ -20,3 +20,13 @@ class ListEntry:
         self.entity_id = entity_id
         self.entity = entity
         self.created_at = created_at
+
+#  https://api-docs.affinity.co/#fields
+class Field:
+    def __init__(self, id: int, name: str, list_id: int, allows_multiple: bool, dropdown_options: List[DropdownOption], value_type: int):
+        self.id = id
+        self.name = name
+        self.list_id = list_id
+        self.allows_multiple = allows_multiple
+        self.dropdown_options = dropdown_options
+        self.value_type = value_type
