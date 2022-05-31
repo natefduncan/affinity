@@ -1,2 +1,3 @@
-# affinity
-Python SDK for Affinity CRM REST API
+# Affinity
+Python library for Affinity CRM REST API
+
