@@ -30,3 +30,12 @@ class Field:
         self.allows_multiple = allows_multiple
         self.dropdown_options = dropdown_options
         self.value_type = value_type
+
+#  https://api-docs.affinity.co/#the-field-value-resource
+class FieldValue:
+    def __init__(self, id: int, field_id: int, entity_id: int, list_entry_id: int, value: Value):
+        self.id = id
+        self.field_id = field_id
+        self.entity_id = entity_id
+        self.list_entry_id = list_entry_id
+        self.value = value
