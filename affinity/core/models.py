@@ -1,27 +1,7 @@
 import datetime as dt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
 from affinity.common.constants import ListType, ActionType, PersonType
-
-#  https://api-docs.affinity.co/#lists
-@dataclass
-class List: 
-    id: int
-    type: ListType
-    name: str
-    public: bool
-    owner_id: int
-    list_size: int
-
-#  https://api-docs.affinity.co/#list-entries
-@dataclass
-class ListEntry:
-    id: int
-    list_id: int
-    creator_id: int
-    entity_id: int
-    entity: Any 
-    created_at: dt.datetime
 
 #  https://api-docs.affinity.co/#fields
 @dataclass
@@ -35,10 +15,31 @@ class DropdownOption:
 class Field:
     id: int
     name: str
-    list_id: int
+    list_id: Optional[int]
     allows_multiple: bool
     dropdown_options: list[DropdownOption]
     value_type: int
+
+#  https://api-docs.affinity.co/#lists
+@dataclass
+class List: 
+    id: int
+    type: ListType
+    name: str
+    public: bool
+    owner_id: int
+    list_size: int
+    fields: list[Field] = field(default_factory=list) 
+
+#  https://api-docs.affinity.co/#list-entries
+@dataclass
+class ListEntry:
+    id: int
+    list_id: int
+    creator_id: int
+    entity_id: int
+    entity: Any 
+    created_at: dt.datetime
 
 #  https://api-docs.affinity.co/#the-field-value-resource
 @dataclass
