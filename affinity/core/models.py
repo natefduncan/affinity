@@ -1,6 +1,6 @@
 import datetime as dt
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from affinity.common.constants import ListType, ActionType, PersonType
 
 #  https://api-docs.affinity.co/#lists
@@ -20,7 +20,7 @@ class ListEntry:
     list_id: int
     creator_id: int
     entity_id: int
-    entity: Entity
+    entity: Any 
     created_at: dt.datetime
 
 #  https://api-docs.affinity.co/#fields
@@ -37,7 +37,7 @@ class Field:
     name: str
     list_id: int
     allows_multiple: bool
-    dropdown_options: List[DropdownOption]
+    dropdown_options: list[DropdownOption]
     value_type: int
 
 #  https://api-docs.affinity.co/#the-field-value-resource
@@ -80,7 +80,7 @@ class FieldValueChange:
 @dataclass
 class Interaction:
     date: dt.datetime
-    person_ids: List[int]
+    person_ids: list[int]
         
 @dataclass
 class Person:
@@ -88,10 +88,10 @@ class Person:
     type: PersonType
     first_name: str
     last_name: str
-    emails: List[str]
+    emails: list[str]
     primary_email: str
-    organization_ids: List[int]
-    opportunity_ids: List[int]
-    list_entries: List[ListEntry]
+    organization_ids: list[int]
+    opportunity_ids: list[int]
+    list_entries: list[ListEntry]
     interaction_dates: Dict[str, dt.datetime]
     interactions: Dict[str, Interaction]
