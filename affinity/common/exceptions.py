@@ -3,3 +3,6 @@ class TokenMissing(Exception):
 
 class RequestTypeNotAllowed(Exception):
     pass
+
+class RequestFailed(Exception):
+    pass

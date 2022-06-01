@@ -2,7 +2,8 @@ import datetime as dt
 import requests as r
 from enum import Enum
 from typing import List, Optional
-from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed
+from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed
+from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
 
@@ -24,30 +25,64 @@ class Endpoint:
             raise TokenMissing
         if RequestType.GET not in self.request_types:
             raise RequestTypeNotAllowed
-        return r.get(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
+        response = r.get(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
+        if response.status_code != 200:
+            raise RequestFailed
+        return self.parse_get(response)
+
+    def parse_get(self, response: r.Response):
+        # Assume 200 status code
+        return response.json()
 
     def list(self):
         if not self.token:
             raise TokenMissing
         if RequestType.LIST not in self.request_types:
             raise RequestTypeNotAllowed
-        return r.get(url=f"{BASE_URL}/{self.endpoint}", auth=("", self.token))
-        
+        response = r.get(url=f"{BASE_URL}/{self.endpoint}", auth=("", self.token))
+        if response.status_code != 200:
+            raise RequestFailed
+        return self.parse_list(response)
+
+    def parse_list(self, response: r.Response):
+        # Assume 200 status code
+        return response.json()
+
     def create(self, data):
         if not self.token:
             raise TokenMissing
         if RequestType.CREATE not in self.request_types:
             raise RequestTypeNotAllowed
         headers = {"Content-Type" : "application/json"}
-        return r.post(url=f"{BASE_URL}/{self.endpoint}", data=data, headers=headers, auth=("", self.token))
+        response = r.post(url=f"{BASE_URL}/{self.endpoint}", data=data, headers=headers, auth=("", self.token))
+        if response.status_code != 200:
+            raise RequestFailed
+        return self.parse_create(response)
+
+    def parse_create(self, response: r.Response):
+        # Assume 200 status code
+        return response.json()
 
     def delete(self, id):
         if not self.token:
             raise TokenMissing
         if RequestType.DELETE not in self.request_types:
             raise RequestTypeNotAllowed
-        return r.delete(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
+        response = r.delete(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
+        if response.status_code != 200:
+            raise RequestFailed
+        return self.parse_delete(response)
+    
+    def parse_delete(self, response: r.Response):
+        # Assume 200 status code
+        return response.json()
 
 class Lists(Endpoint):
     endpoint = "lists"
     request_types = [RequestType.GET, RequestType.LIST]
+    
+    def parse_get(self, response: r.Response) -> models.List:
+        return models.List(**response.json())
+
+    def parse_list(self, response: r.Response) -> list[models.List]:
+        return [models.List(**i) for i in response.json()]
