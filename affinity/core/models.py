@@ -1,7 +1,7 @@
 import datetime as dt
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
-from affinity.common.constants import ListType, ActionType, PersonType
+from typing import Dict, Optional, Any
+from affinity.common.constants import ListType, ActionType, PersonType, EntityType
 
 #  https://api-docs.affinity.co/#fields
 @dataclass
@@ -38,6 +38,7 @@ class ListEntry:
     list_id: int
     creator_id: int
     entity_id: int
+    entity_type: EntityType
     entity: Any 
     created_at: dt.datetime
 

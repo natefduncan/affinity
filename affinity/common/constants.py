@@ -13,4 +13,8 @@ class ActionType(Enum):
 class PersonType(Enum):
     external = 0
     internal = 1
-    
+
+class EntityType(Enum):
+    person = 0
+    organization = 1
+    opportunity = 8

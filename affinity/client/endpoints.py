@@ -27,7 +27,7 @@ class Endpoint:
             raise RequestTypeNotAllowed
         response = r.get(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
         if response.status_code != 200:
-            raise RequestFailed
+            raise RequestFailed(response.content)
         return self.parse_get(response)
 
     def parse_get(self, response: r.Response):
@@ -39,9 +39,10 @@ class Endpoint:
             raise TokenMissing
         if RequestType.LIST not in self.request_types:
             raise RequestTypeNotAllowed
+        print(self.endpoint)
         response = r.get(url=f"{BASE_URL}/{self.endpoint}", auth=("", self.token))
         if response.status_code != 200:
-            raise RequestFailed
+            raise RequestFailed(response.content)
         return self.parse_list(response)
 
     def parse_list(self, response: r.Response):
@@ -56,7 +57,7 @@ class Endpoint:
         headers = {"Content-Type" : "application/json"}
         response = r.post(url=f"{BASE_URL}/{self.endpoint}", data=data, headers=headers, auth=("", self.token))
         if response.status_code != 200:
-            raise RequestFailed
+            raise RequestFailed(response.content)
         return self.parse_create(response)
 
     def parse_create(self, response: r.Response):
@@ -70,7 +71,7 @@ class Endpoint:
             raise RequestTypeNotAllowed
         response = r.delete(url=f"{BASE_URL}/{self.endpoint}/{id}", auth=("", self.token))
         if response.status_code != 200:
-            raise RequestFailed
+            raise RequestFailed(response.content)
         return self.parse_delete(response)
     
     def parse_delete(self, response: r.Response):
@@ -86,3 +87,13 @@ class Lists(Endpoint):
 
     def parse_list(self, response: r.Response) -> list[models.List]:
         return [models.List(**i) for i in response.json()]
+
+class ListEntries(Endpoint):
+    request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+
+    def __init__(self, token: str, list_id: int):
+        self.endpoint = f"lists/{list_id}/list-entries"
+        super().__init__(token)
+
+    def parse_list(self, response: r.Response) -> list[models.ListEntry]:
+        return [models.ListEntry(**i) for i in response.json()]
