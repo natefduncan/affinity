@@ -1,0 +1,2 @@
+class TokenMissing(Exception):
+    pass
