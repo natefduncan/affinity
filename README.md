@@ -2,7 +2,7 @@
 Python library for Affinity CRM REST API
 
 ## Endpoints
-- [ ] [Lists](https://api-docs.affinity.co/#lists)
+- [x] [Lists](https://api-docs.affinity.co/#lists)
 - [ ] [List Entries](https://api-docs.affinity.co/#list-entries)
 - [ ] [Fields](https://api-docs.affinity.co/#fields)
 - [ ] [Field Values](https://api-docs.affinity.co/#field-values)
