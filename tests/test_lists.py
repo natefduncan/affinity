@@ -18,7 +18,13 @@ def test_lists_get():
 def test_list_entries_list():
     client = Client(AFFINITY_TOKEN)
     a = client.lists.list()[0]
-    print(a)
     assert isinstance(client.list_entries(list_id=a.id).list()[0], models.ListEntry)
+
+def test_list_entries_get():
+    client = Client(AFFINITY_TOKEN)
+    a = client.lists.list()[0]
+    many = client.list_entries(list_id=a.id).list()
+    one = client.list_entries(list_id=a.id).get(many[0].id)
+    assert isinstance(one, models.ListEntry)
 
 

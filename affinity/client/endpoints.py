@@ -97,3 +97,6 @@ class ListEntries(Endpoint):
 
     def parse_list(self, response: r.Response) -> list[models.ListEntry]:
         return [models.ListEntry(**i) for i in response.json()]
+
+    def parse_get(self, response: r.Response) -> models.ListEntry:
+        return models.ListEntry(**response.json())
