@@ -118,3 +118,6 @@ class Persons(Endpoint):
                 "persons" : [models.Person(**i) for i in data["persons"]],
                 "next_page_token" : data["next_page_token"]
         }
+
+    def parse_get(self, response: r.Response) -> models.Person:
+        return models.Person(**response.json())
