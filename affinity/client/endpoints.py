@@ -100,3 +100,11 @@ class ListEntries(Endpoint):
 
     def parse_get(self, response: r.Response) -> models.ListEntry:
         return models.ListEntry(**response.json())
+
+class Fields(Endpoint):
+    endpoint = "fields"
+    request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+
+    def parse_list(self, response: r.Response) -> list[models.Field]:
+        return [models.Field(**i) for i in response.json()]
+   

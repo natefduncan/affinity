@@ -16,6 +16,8 @@ class Field:
     id: int
     name: str
     list_id: Optional[int]
+    enrichment_source: Optional[str]
+    track_changes: bool
     allows_multiple: bool
     dropdown_options: list[DropdownOption]
     value_type: int
