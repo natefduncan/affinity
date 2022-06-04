@@ -94,8 +94,8 @@ class Person:
     last_name: str
     emails: list[str]
     primary_email: str
-    organization_ids: list[int]
-    opportunity_ids: list[int]
-    list_entries: list[ListEntry]
-    interaction_dates: Dict[str, dt.datetime]
-    interactions: Dict[str, Interaction]
+    organization_ids: list[int] = field(default_factory=list) 
+    opportunity_ids: list[int] = field(default_factory=list)
+    list_entries: list[ListEntry] = field(default_factory=list) 
+    interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
+    interactions: Dict[str, Interaction] = field(default_factory=dict)

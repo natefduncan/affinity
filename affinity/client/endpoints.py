@@ -108,3 +108,13 @@ class Fields(Endpoint):
     def parse_list(self, response: r.Response) -> list[models.Field]:
         return [models.Field(**i) for i in response.json()]
    
+class Persons(Endpoint):
+    endpoint = "persons"
+    request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        return {
+                "persons" : [models.Person(**i) for i in data["persons"]],
+                "next_page_token" : data["next_page_token"]
+        }
