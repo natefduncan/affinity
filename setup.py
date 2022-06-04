@@ -7,6 +7,6 @@ setup(
         author='Nathan Duncan',
         author_email='',
         packages=['affinity'],  # would be the same as name
-        install_requires=['requests==2.27.1'], #external packages acting as dependencies
+        install_requires=['requests==2.27.1', "dataclasses_json==0.5.7"], #external packages acting as dependencies
         )
 

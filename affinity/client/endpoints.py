@@ -121,3 +121,17 @@ class Persons(Endpoint):
 
     def parse_get(self, response: r.Response) -> models.Person:
         return models.Person(**response.json())
+ 
+class Organizations(Endpoint):
+    endpoint = "organizations"
+    request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        return {
+                "organizations" : [models.Organization.from_dict(i) for i in data["organizations"]],
+                "next_page_token" : data["next_page_token"]
+        }
+
+    def parse_get(self, response: r.Response) -> models.Organization:
+        return models.Organization.from_dict(response.json())

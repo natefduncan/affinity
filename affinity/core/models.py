@@ -1,4 +1,5 @@
 import datetime as dt
+from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
 from affinity.common.constants import ListType, ActionType, PersonType, EntityType
@@ -99,3 +100,17 @@ class Person:
     list_entries: list[ListEntry] = field(default_factory=list) 
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
     interactions: Dict[str, Interaction] = field(default_factory=dict)
+
+@dataclass_json
+@dataclass
+class Organization:
+    id: int
+    name: str
+    domain: str
+    domains: list[str]
+    crunchbase_uuid: Optional[str]
+    global_: Optional[bool] = field(metadata=config(field_name="global"))
+    person_ids: list[int] = field(default_factory=list)
+    opportunity_ids: list[int] = field(default_factory=list) 
+    list_entries: list[ListEntry] = field(default_factory=list)
+    
