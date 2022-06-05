@@ -2,7 +2,7 @@ import datetime as dt
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
-from affinity.common.constants import ListType, ActionType, PersonType, EntityType
+from affinity.common.constants import ListType, ActionType, PersonType, EntityType, InteractionType, DirectionType, LoggingType
 
 #  https://api-docs.affinity.co/#fields
 @dataclass
@@ -83,7 +83,7 @@ class FieldValueChange:
 
 #  https://api-docs.affinity.co/#persons
 @dataclass
-class Interaction:
+class ShortInteraction:
     date: dt.datetime
     person_ids: list[int]
         
@@ -99,7 +99,7 @@ class Person:
     opportunity_ids: list[int] = field(default_factory=list)
     list_entries: list[ListEntry] = field(default_factory=list) 
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
-    interactions: Dict[str, Interaction] = field(default_factory=dict)
+    interactions: Dict[str, ShortInteraction] = field(default_factory=dict)
 
 @dataclass_json
 @dataclass
@@ -113,4 +113,15 @@ class Organization:
     person_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list) 
     list_entries: list[ListEntry] = field(default_factory=list)
-    
+
+@dataclass
+class EmailInteraction:
+    date: dt.datetime
+    id: int
+    subject: str
+    type: InteractionType
+    from_: Person = field(metadata=config(field_name="from"))
+    to: list[Person] 
+    cc: list[Person]
+    direction: DirectionType
+

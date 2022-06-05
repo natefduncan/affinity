@@ -1,6 +1,6 @@
-from typing import List, Optional, Dict
 from affinity.core.models import *
-from affinity.client.endpoints import Lists, ListEntries, Fields, Persons, Organizations
+from affinity.client.endpoints import Lists, ListEntries, Fields, Persons, Organizations, Interactions
+from affinity.common.constants import InteractionType
 
 class Client:
     def __init__(self, token: str):
@@ -20,3 +20,6 @@ class Client:
 
     def organizations(self):
         return Organizations(self.token)
+
+    def interactions(self, type: InteractionType):
+        return Interactions(self.token, type)

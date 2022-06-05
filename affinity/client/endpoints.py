@@ -3,6 +3,7 @@ import requests as r
 from enum import Enum
 from typing import List, Optional
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed
+from affinity.common.constants import InteractionType
 from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
@@ -135,3 +136,18 @@ class Organizations(Endpoint):
 
     def parse_get(self, response: r.Response) -> models.Organization:
         return models.Organization.from_dict(response.json())
+
+class Interactions(Endpoint):
+    endpoint = "interactions"
+    request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+
+    def __init__(self, token: str, type: InteractionType):
+        self.type = type
+        super().__init__(token)
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        return {
+                    "emails" : [models.EmailInteraction.from_dict(i) for i in data["emails"]],
+                    "next_page_token": data["next_page_token"]
+                    }
