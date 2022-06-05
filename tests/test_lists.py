@@ -27,4 +27,3 @@ def test_list_entries_get():
     one = client.list_entries(list_id=a.id).get(many[0].id)
     assert isinstance(one, models.ListEntry)
 
-

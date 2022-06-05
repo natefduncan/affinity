@@ -4,7 +4,7 @@ Python library for Affinity CRM REST API
 ## Endpoints
 - [x] [Lists](https://api-docs.affinity.co/#lists)
 - [x] [List Entries (GET, LIST)](https://api-docs.affinity.co/#list-entries)
-- [ ] [List Entries (CREATE, DELETE)](https://api-docs.affinity.co/#list-entries)
+- [x] [List Entries (CREATE, DELETE)](https://api-docs.affinity.co/#list-entries)
 - [x] [Fields (LIST)](https://api-docs.affinity.co/#fields)
 - [ ] [Fields (CREATE, DELETE)](https://api-docs.affinity.co/#fields)
 - [ ] [Field Values](https://api-docs.affinity.co/#field-values)

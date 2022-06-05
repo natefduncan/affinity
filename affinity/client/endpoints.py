@@ -40,7 +40,6 @@ class Endpoint:
             raise TokenMissing
         if RequestType.LIST not in self.request_types:
             raise RequestTypeNotAllowed
-        print(self.endpoint)
         response = r.get(url=f"{BASE_URL}/{self.endpoint}", auth=("", self.token))
         if response.status_code != 200:
             raise RequestFailed(response.content)
@@ -56,7 +55,7 @@ class Endpoint:
         if RequestType.CREATE not in self.request_types:
             raise RequestTypeNotAllowed
         headers = {"Content-Type" : "application/json"}
-        response = r.post(url=f"{BASE_URL}/{self.endpoint}", data=data, headers=headers, auth=("", self.token))
+        response = r.post(url=f"{BASE_URL}/{self.endpoint}", json=data, headers=headers, auth=("", self.token))
         if response.status_code != 200:
             raise RequestFailed(response.content)
         return self.parse_create(response)
@@ -100,6 +99,9 @@ class ListEntries(Endpoint):
         return [models.ListEntry(**i) for i in response.json()]
 
     def parse_get(self, response: r.Response) -> models.ListEntry:
+        return models.ListEntry(**response.json())
+
+    def parse_create(self, response: r.Response) -> models.ListEntry:
         return models.ListEntry(**response.json())
 
 class Fields(Endpoint):
