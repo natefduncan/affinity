@@ -160,6 +160,7 @@ class ListEntries(Endpoint):
 class Fields(Endpoint):
     endpoint = "fields"
     allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+    required_payload_fields = ["name", "entity_type", "value_type"]
 
     def list(self, list_id: Optional[int] = None, value_type: Optional[int] = None, with_modified_names: Optional[bool] = False):
         query_params = {k: v for k,v in locals().get("kwargs", {}).items() if v}
@@ -182,6 +183,7 @@ class Fields(Endpoint):
 class Persons(Endpoint):
     endpoint = "persons"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+    required_payload_fields = ["first_name", "last_name", "emails"]
 
     # TODO: Impl min&max_{interaction_type}_date query parms
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
@@ -205,6 +207,7 @@ class Persons(Endpoint):
 class Organizations(Endpoint):
     endpoint = "organizations"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+    required_payload_fields = ["name"]
 
     # TODO: Impl min&max_{interaction_type}_date query params
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
