@@ -1,34 +1,44 @@
-from enum import Enum
+from enum import IntEnum
 
-class ListType(Enum):
+class ListType(IntEnum):
     person = 0
     organization = 1
     opportunity = 8
 
-class ActionType(Enum):
+class ActionType(IntEnum):
     create = 0
     delete = 1
     update = 2
 
-class PersonType(Enum):
+class PersonType(IntEnum):
     external = 0
     internal = 1
 
-class EntityType(Enum):
+class EntityType(IntEnum):
     person = 0
     organization = 1
     opportunity = 8
 
-class InteractionType(Enum):
+class InteractionType(IntEnum):
     meeting = 0
     call = 1
     chat_message = 2
     email = 3
 
-class DirectionType(Enum):
+class DirectionType(IntEnum):
     sent = 0
     received = 1
 
-class LoggingType(Enum):
+class LoggingType(IntEnum):
     all = 0
     manual = 1
+
+class ValueType(IntEnum):
+    person = 0
+    organization = 1
+    dropdown = 2
+    number = 3
+    date = 4
+    location = 5
+    text = 6
+    ranked_dropdown = 7

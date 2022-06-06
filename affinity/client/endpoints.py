@@ -85,7 +85,7 @@ class Endpoint:
         return self.parse_create(response)
 
     def create(self, payload: dict = {}):
-        self._create(payload)
+        return self._create(payload)
 
     def parse_create(self, response: r.Response):
         # Assume 200 status code
