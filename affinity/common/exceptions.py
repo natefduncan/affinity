@@ -6,3 +6,9 @@ class RequestTypeNotAllowed(Exception):
 
 class RequestFailed(Exception):
     pass
+
+class RequiredPayloadFieldMissing(Exception):
+    pass
+
+class RequiredQueryParamMissing(Exception):
+    pass
