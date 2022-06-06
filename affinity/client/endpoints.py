@@ -13,6 +13,7 @@ class RequestType(Enum):
     LIST = 2
     CREATE =  3
     DELETE = 4
+    UPDATE = 5
 
 class Endpoint:
     endpoint : str = ""
@@ -106,6 +107,25 @@ class Endpoint:
         # Assume 200 status code
         return response.json()
 
+    def _update(self, payload: dict):
+        if not self.token:
+            raise TokenMissing
+        if RequestType.UPDATE not in self.allowed_request_types:
+            raise RequestTypeNotAllowed
+        headers = {"Content-Type" : "application/json"}
+        url = self.construct_url(payload)
+        response = r.put(url=url, auth=("", self.token), headers=headers)
+        if response.status_code != 200:
+            raise RequestFailed(response.content)
+        return self.parse_update(response)
+
+    def parse_update(self, response: r.Response):
+        # Assume 200 status code
+        return response.json()
+
+    def update(self, payload: dict = {}):
+        return self._update(payload)
+    
 class Lists(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST]
     endpoint = "lists"
@@ -182,7 +202,7 @@ class Fields(Endpoint):
     
 class Persons(Endpoint):
     endpoint = "persons"
-    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
     required_payload_fields = ["first_name", "last_name", "emails"]
 
     # TODO: Impl min&max_{interaction_type}_date query parms
@@ -204,6 +224,21 @@ class Persons(Endpoint):
     def parse_get(self, response: r.Response) -> models.Person:
         return models.Person(**response.json())
  
+    # Default create
+
+    def parse_create(self, response: r.Response) -> models.Person:
+        return models.Person(**response.json())
+
+    def delete(self, person_id: int):
+        self.endpoint = f"persons/{person_id}"
+        return self._delete()
+
+    # Default parse delete
+
+    def update(self, person_id: int, payload: dict):
+        self.endpoint = f"persons/{person_id}"
+        return self._update(payload)
+
 class Organizations(Endpoint):
     endpoint = "organizations"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
