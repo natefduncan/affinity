@@ -201,6 +201,30 @@ class Fields(Endpoint):
 
     # Default parse delete
     
+def parse_value(fields, field_value) -> models.Value:
+    value = {k: None for k in ["person","organization","dropdown", "number", "date", "location", "text", "ranked_dropdown", "opportunity"]}
+    field = next((f for f in fields if f.id == field_value['field_id']), None)
+    if field:
+        if field.value_type == ValueType.person:
+            value["person"] = field_value["value"]
+        elif field.value_type == ValueType.organization:
+            value["organization"] = field_value["value"]
+        elif field.value_type == ValueType.dropdown:
+            value["dropdown"] = field_value["value"]
+        elif field.value_type == ValueType.number:
+            value["number"] = field_value["value"]
+        elif field.value_type == ValueType.date:
+            value["date"] = field_value["value"]
+        elif field.value_type == ValueType.location:
+            value["location"] = models.Location(**field_value["value"])
+        elif field.value_type == ValueType.text:
+            value["text"] = field_value["value"]
+        elif field.value_type == ValueType.ranked_dropdown:
+            value["ranked_dropdown"] = field_value["value"]
+        elif field.value_type == ValueType.opportunity:
+            value["opportunity"] = field_value["value"]
+    return models.Value(**value)
+
 class FieldValues(Endpoint):
     endpoint = "field-values"
     allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
@@ -218,37 +242,42 @@ class FieldValues(Endpoint):
         fields = Fields(self.token).list()
         fvs = []
         for fv in response.json():
-            field = next((f for f in fields if f.id == fv['field_id']), None)
-            value = {k: None for k in ["person","organization","dropdown", "number", "date", "location", "text", "ranked_dropdown", "opportunity"]}
-            if field:
-                if field.value_type == ValueType.person:
-                    value["person"] = fv["value"]
-                elif field.value_type == ValueType.organization:
-                    value["organization"] = fv["value"]
-                elif field.value_type == ValueType.dropdown:
-                    value["dropdown"] = fv["value"]
-                elif field.value_type == ValueType.number:
-                    value["number"] = fv["value"]
-                elif field.value_type == ValueType.date:
-                    value["date"] = fv["value"]
-                elif field.value_type == ValueType.location:
-                    print(fv["value"])
-                    value["location"] = models.Location(**fv["value"])
-                elif field.value_type == ValueType.text:
-                    value["text"] = fv["value"]
-                elif field.value_type == ValueType.ranked_dropdown:
-                    value["ranked_dropdown"] = fv["value"]
-                elif field.value_type == ValueType.opportunity:
-                    value["opportunity"] = fv["value"]
-                fvs.append(models.FieldValue(**{
-                    "id" : fv['id'],
-                    "field_id" : fv['field_id'], 
-                    "list_entry_id" : fv["list_entry_id"], 
-                    "entity_id": fv["entity_id"], 
-                    "value" : models.Value(**value)
-                    })
-                )
+            value = parse_value(fields, fv)
+            fvs.append(models.FieldValue(**{
+                "id" : fv['id'],
+                "field_id" : fv['field_id'], 
+                "list_entry_id" : fv["list_entry_id"], 
+                "entity_id": fv["entity_id"], 
+                "value" : value
+                })
+            )
         return fvs 
+
+    # Default create
+    
+    def parse_create(self, response: r.Response) -> models.FieldValue:
+        fields = Fields(self.token).list()
+        field_value = response.json()
+        value = parse_value(fields, field_value)
+        return models.FieldValue(**{
+            "id" : field_value["id"], 
+            "field_id" : field_value["field_id"],
+            "list_entry_id" : field_value["list_entry_id"], 
+            "entity_id" : field_value["entity_id"], 
+            "value" : value
+        })
+
+    def update(self, field_value_id: int, payload: dict):
+        self.endpoint = f"field-values/{field_value_id}"
+        return self._update(payload)
+
+    # Default parse update
+
+    def delete(self, field_value_id: int):
+        self.endpoint = f"field-values/{field_value_id}"
+        return self._delete()
+
+    # Default parse delete
 
 class Persons(Endpoint):
     endpoint = "persons"
@@ -288,6 +317,8 @@ class Persons(Endpoint):
     def update(self, person_id: int, payload: dict):
         self.endpoint = f"persons/{person_id}"
         return self._update(payload)
+
+    # Default parse update
 
 class Organizations(Endpoint):
     endpoint = "organizations"

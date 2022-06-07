@@ -8,7 +8,7 @@ Python library for Affinity CRM REST API
 - [x] [Fields (LIST)](https://api-docs.affinity.co/#fields)
 - [x] [Fields (CREATE, DELETE)](https://api-docs.affinity.co/#fields)
 - [x] [Field Values (LIST)](https://api-docs.affinity.co/#field-values)
-- [ ] [Field Values (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#field-values)
+- [x] [Field Values (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#field-values)
 - [ ] [Field Value Changes](https://api-docs.affinity.co/#field-value-changes)
 - [x] [Persons (GET, LIST)](https://api-docs.affinity.co/#persons)
 - [x] [Persons (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#persons)
