@@ -48,10 +48,11 @@ class ListEntry:
 #  https://api-docs.affinity.co/#the-field-value-resource
 @dataclass
 class Location:
-    street_address: str
-    city: str
-    state: str
-    country: str
+    street_address: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    country: Optional[str]
+    continent: Optional[str]
 
 @dataclass
 class Value:
@@ -62,6 +63,8 @@ class Value:
     location: Optional[Location]
     date: Optional[dt.datetime]
     text: Optional[str]
+    opportunity: Optional[str]
+    ranked_dropdown: Optional[str]
 
 @dataclass
 class FieldValue:

@@ -12,3 +12,6 @@ class RequiredPayloadFieldMissing(Exception):
 
 class RequiredQueryParamMissing(Exception):
     pass
+
+class ClientError(Exception):
+    pass

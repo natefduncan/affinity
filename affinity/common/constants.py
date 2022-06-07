@@ -42,3 +42,4 @@ class ValueType(IntEnum):
     location = 5
     text = 6
     ranked_dropdown = 7
+    opportunity = 8

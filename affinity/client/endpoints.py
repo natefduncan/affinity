@@ -2,8 +2,8 @@ import datetime as dt
 import requests as r
 from enum import Enum
 from typing import List, Optional
-from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing
-from affinity.common.constants import InteractionType
+from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
+from affinity.common.constants import InteractionType, ValueType
 from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
@@ -158,7 +158,7 @@ class ListEntries(Endpoint):
 
     def list(self, page_size: Optional[int] = None, page_token: Optional[str] = None):
         self.endpoint = f"lists/{self.list_id}/list-entries"
-        query_params = {k: v for k,v in locals().get("kwargs", {}).items() if v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.ListEntry]:
@@ -184,6 +184,7 @@ class Fields(Endpoint):
 
     def list(self, list_id: Optional[int] = None, value_type: Optional[int] = None, with_modified_names: Optional[bool] = False):
         query_params = {k: v for k,v in locals().get("kwargs", {}).items() if v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.Field]:
@@ -200,6 +201,55 @@ class Fields(Endpoint):
 
     # Default parse delete
     
+class FieldValues(Endpoint):
+    endpoint = "field-values"
+    allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
+    required_payload_fields = ["field_id", "entity_id", "value"]
+
+    def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, list_entry_id: Optional[int] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        if not query_params:
+            raise RequiredQueryParamMissing("Must have person_id, organization_id, opportunity_id, or list_entry_id")
+        if len(query_params) != 1:
+            raise ClientError("Can only input one query parameter for this endpoint")
+        return self._list(query_params)
+
+    def parse_list(self, response: r.Response) -> List[models.FieldValue]:
+        fields = Fields(self.token).list()
+        fvs = []
+        for fv in response.json():
+            field = next((f for f in fields if f.id == fv['field_id']), None)
+            value = {k: None for k in ["person","organization","dropdown", "number", "date", "location", "text", "ranked_dropdown", "opportunity"]}
+            if field:
+                if field.value_type == ValueType.person:
+                    value["person"] = fv["value"]
+                elif field.value_type == ValueType.organization:
+                    value["organization"] = fv["value"]
+                elif field.value_type == ValueType.dropdown:
+                    value["dropdown"] = fv["value"]
+                elif field.value_type == ValueType.number:
+                    value["number"] = fv["value"]
+                elif field.value_type == ValueType.date:
+                    value["date"] = fv["value"]
+                elif field.value_type == ValueType.location:
+                    print(fv["value"])
+                    value["location"] = models.Location(**fv["value"])
+                elif field.value_type == ValueType.text:
+                    value["text"] = fv["value"]
+                elif field.value_type == ValueType.ranked_dropdown:
+                    value["ranked_dropdown"] = fv["value"]
+                elif field.value_type == ValueType.opportunity:
+                    value["opportunity"] = fv["value"]
+                fvs.append(models.FieldValue(**{
+                    "id" : fv['id'],
+                    "field_id" : fv['field_id'], 
+                    "list_entry_id" : fv["list_entry_id"], 
+                    "entity_id": fv["entity_id"], 
+                    "value" : models.Value(**value)
+                    })
+                )
+        return fvs 
+
 class Persons(Endpoint):
     endpoint = "persons"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
@@ -207,7 +257,7 @@ class Persons(Endpoint):
 
     # TODO: Impl min&max_{interaction_type}_date query parms
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
-        query_params = {k: v for k,v in locals().get("kwargs", {}).items() if v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -246,7 +296,7 @@ class Organizations(Endpoint):
 
     # TODO: Impl min&max_{interaction_type}_date query params
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
-        query_params = {k: v for k, v in locals().get("kwargs", {}).items() if v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
