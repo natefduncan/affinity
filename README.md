@@ -13,7 +13,7 @@ Python library for Affinity CRM REST API
 - [x] [Persons (GET, LIST)](https://api-docs.affinity.co/#persons)
 - [x] [Persons (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#persons)
 - [x] [Organizations (GET, LIST)](https://api-docs.affinity.co/#organizations) 
-- [ ] [Organizations (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#organizations) 
+- [x] [Organizations (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#organizations) 
 - [ ] [Opportunities](https://api-docs.affinity.co/#opportunities)
 - [ ] [Interactions (GET, LIST)](https://api-docs.affinity.co/#interactions) 
 - [ ] [Interactions (CREATE, UPDATE, DELETE)](https://api-docs.affinity.co/#interactions) 

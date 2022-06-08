@@ -322,7 +322,7 @@ class Persons(Endpoint):
 
 class Organizations(Endpoint):
     endpoint = "organizations"
-    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
     required_payload_fields = ["name"]
 
     # TODO: Impl min&max_{interaction_type}_date query params
@@ -343,6 +343,22 @@ class Organizations(Endpoint):
 
     def parse_get(self, response: r.Response) -> models.Organization:
         return models.Organization.from_dict(response.json())
+
+    # Default create
+    def parse_create(self, response: r.Response) -> models.Organization:
+        return models.Organization.from_dict(response.json())
+
+    def delete(self, organization_id: int):
+        self.endpoint = f"organizations/{organization_id}"
+        return self._delete()
+
+    # Default parse delete
+
+    def update(self, organization_id: int, payload: dict):
+        self.endpoint = f"organizations/{organization_id}"
+        return self._update(payload)
+
+    # Default parse update
 
 class Interactions(Endpoint):
     endpoint = "interactions"
