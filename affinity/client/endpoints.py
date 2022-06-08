@@ -332,6 +332,7 @@ class Organizations(Endpoint):
 
     def parse_list(self, response: r.Response) -> dict:
         data = response.json()
+        print(data["organizations"][0].keys())
         return {
             "organizations" : [models.Organization.from_dict(i) for i in data["organizations"]],
             "next_page_token" : data["next_page_token"]
@@ -356,6 +357,45 @@ class Organizations(Endpoint):
 
     def update(self, organization_id: int, payload: dict):
         self.endpoint = f"organizations/{organization_id}"
+        return self._update(payload)
+
+    # Default parse update
+
+class Opportunities(Endpoint):
+    endpoint = "opportunities"
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
+    required_payload_fields = ["name", "list_id"]
+
+    def list(self, term: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        return {
+            "opportunities" : [models.Opportunity(**i) for i in data["opportunities"]],
+            "next_page_token" : data["next_page_token"]
+        }
+
+    def get(self, opportunity_id: int):
+        self.endpoint = f"opportunities/{opportunity_id}"
+        return self._get()
+
+    def parse_get(self, response: r.Response) -> models.Opportunity:
+        return models.Opportunity(**response.json())
+
+    # Default create
+    def parse_create(self, response: r.Response) -> models.Opportunity:
+        return models.Opportunity(**response.json())
+
+    def delete(self, opportunity_id: int):
+        self.endpoint = f"opportunities/{opportunity_id}"
+        return self._delete()
+
+    # Default parse delete
+
+    def update(self, opportunity_id: int, payload: dict):
+        self.endpoint = f"opportunities/{opportunity_id}"
         return self._update(payload)
 
     # Default parse update

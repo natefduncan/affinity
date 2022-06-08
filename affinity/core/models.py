@@ -42,8 +42,8 @@ class ListEntry:
     creator_id: int
     entity_id: int
     entity_type: EntityType
-    entity: Any 
     created_at: dt.datetime
+    entity: Optional[Any] = None
 
 #  https://api-docs.affinity.co/#the-field-value-resource
 @dataclass
@@ -128,3 +128,10 @@ class EmailInteraction:
     cc: list[Person]
     direction: DirectionType
 
+@dataclass
+class Opportunity:
+    id: int
+    name: str
+    person_ids: list[int] = field(default_factory=list)
+    organization_ids: list[int] = field(default_factory=list)
+    list_entries: list[ListEntry] = field(default_factory=list)
