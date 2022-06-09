@@ -11,7 +11,7 @@ Python library for Affinity CRM REST API
 - [x] [Organizations](https://api-docs.affinity.co/#organizations) 
 - [x] [Opportunities](https://api-docs.affinity.co/#opportunities)
 - [ ] [Interactions](https://api-docs.affinity.co/#interactions) 
-- [ ] [Relationship Strengths](https://api-docs.affinity.co/#relationship-strengths)
+- [x] [Relationship Strengths](https://api-docs.affinity.co/#relationship-strengths)
 - [ ] [Notes](https://api-docs.affinity.co/#notes)
 - [ ] [Entity Files](https://api-docs.affinity.co/#entity-files)
 - [ ] [Reminders](https://api-docs.affinity.co/#reminders)
