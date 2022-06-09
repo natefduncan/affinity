@@ -414,3 +414,15 @@ class Interactions(Endpoint):
             "emails" : [models.EmailInteraction.from_dict(i) for i in data["emails"]],
             "next_page_token": data["next_page_token"]
         }
+
+class RelationshipsStrengths(Endpoint):
+    endpoint = "relationships-strengths"
+    allowed_request_types = [RequestType.LIST]
+    required_query_params = ["external_id"]
+
+    def list(self, external_id: int, internal_id: Optional[int] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> List[models.RelationshipStrength]:
+        return [models.RelationshipStrength(**i) for i in response.json()]

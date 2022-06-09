@@ -135,3 +135,9 @@ class Opportunity:
     person_ids: list[int] = field(default_factory=list)
     organization_ids: list[int] = field(default_factory=list)
     list_entries: list[ListEntry] = field(default_factory=list)
+
+@dataclass
+class RelationshipStrength:
+    internal_id: int
+    external_id: int
+    strength: float
