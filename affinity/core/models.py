@@ -141,3 +141,17 @@ class RelationshipStrength:
     internal_id: int
     external_id: int
     strength: float
+
+@dataclass
+class Note:
+    id: int
+    creator_id: int
+    parent_id: int
+    content: str
+    created_at: dt.datetime
+    is_meeting: bool
+    mentioned_person_ids: list = field(default_factory=list)
+    person_ids: list[int] = field(default_factory=list)
+    organization_ids: list[int] = field(default_factory=list)
+    opportunity_ids: list[int] = field(default_factory=list)
+

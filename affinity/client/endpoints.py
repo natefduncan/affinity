@@ -426,3 +426,48 @@ class RelationshipsStrengths(Endpoint):
 
     def parse_list(self, response: r.Response) -> List[models.RelationshipStrength]:
         return [models.RelationshipStrength(**i) for i in response.json()]
+
+class Notes(Endpoint):
+    endpoint = "notes"
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
+
+    def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        data["notes"] = [models.Note(**i) for i in data["notes"]]
+        return data
+
+    def get(self, note_id: int):
+        self.endpoint = f"notes/{note_id}"
+        return self._get()
+
+    def parse_get(self, response: r.Response) -> models.Note:
+        return models.Note(**response.json())
+
+    def create(self, payload: dict):
+        # Must have either gmail_id or content
+        if "content" not in payload and "gmail_id" not in payload:
+            raise RequiredPayloadFieldMissing("Must have either 'content' or 'gmail_id' in payload")
+        return self._create(payload)
+
+    def parse_create(self, response: r.Response) -> models.Note:
+        return models.Note(**response.json())
+
+    def delete(self, note_id: int):
+        self.endpoint = f"notes/{note_id}"
+        return self._delete()
+
+    # Default parse delete
+
+    def update(self, note_id: int, payload: dict):
+        #  You cannot update the content of a note that has mentions. 
+        #  You also cannot update the content of a note associated with an email.
+        if "content" not in payload:
+            raise RequiredPayloadFieldMissing("Must have 'content' in payload")
+        self.endpoint = f"notes/{note_id}"
+        return self._update(payload)
+
+    # Default parse update

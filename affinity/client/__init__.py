@@ -1,5 +1,5 @@
 from affinity.core.models import *
-from affinity.client.endpoints import Lists, ListEntries, Fields, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths
+from affinity.client.endpoints import Lists, ListEntries, Fields, Notes, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths, Notes
 from affinity.common.constants import InteractionType
 
 class Client:
@@ -32,3 +32,6 @@ class Client:
 
     def relationships_strengths(self):
         return RelationshipsStrengths(self.token)
+
+    def notes(self):
+        return Notes(self.token)
