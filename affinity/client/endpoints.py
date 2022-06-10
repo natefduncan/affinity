@@ -1,7 +1,8 @@
-import datetime as dt
+import mimetypes
+import io
 import requests as r
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Dict
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
 from affinity.common.constants import InteractionType, ValueType
 from affinity.core import models
@@ -44,7 +45,7 @@ class Endpoint:
         if RequestType.GET not in self.allowed_request_types:
             raise RequestTypeNotAllowed
         url = self.construct_url({})
-        response = r.get(url=url, auth=("", self.token))
+        response = r.get(url=url, auth=("", self.token), allow_redirects=True)
         if response.status_code != 200:
             raise RequestFailed(response.content)
         return self.parse_get(response)
@@ -52,6 +53,22 @@ class Endpoint:
     def parse_get(self, response: r.Response):
         # Assume 200 status code
         return response.json()
+
+    def _download(self, save_path: str):
+        if not self.token:
+            raise TokenMissing
+        if RequestType.GET not in self.allowed_request_types:
+            raise RequestTypeNotAllowed
+        url = self.construct_url({})
+        response = r.get(url=url, auth=("", self.token), allow_redirects=True)
+        if response.status_code != 200:
+            raise RequestFailed(response.content)
+        return self.parse_download(response, save_path)
+
+    def parse_download(self, response: r.Response, save_path: str):
+        # Assume 200 status code
+        with open(save_path, "wb") as file:
+            file.write(response.content)
 
     def _list(self, query_params: dict):
         if not self.token:
@@ -91,6 +108,21 @@ class Endpoint:
     def parse_create(self, response: r.Response):
         # Assume 200 status code
         return response.json()
+
+    def _upload(self, files: dict, form: dict):
+        if not self.token:
+            raise TokenMissing
+        if RequestType.CREATE not in self.allowed_request_types:
+            raise RequestTypeNotAllowed
+        url = self.construct_url({})
+        # FIXME: Figure out how to upload multiple files
+        responses = []
+        for file_name, file in files.items():
+            response = r.post(url=url, files={"file" : (file_name, file, mimetypes.guess_type(file_name)[0])}, params=form, auth=("", self.token))
+            if response.status_code != 200:
+                raise RequestFailed(response.content)
+            responses.append(self.parse_create(response))
+        return responses
 
     def _delete(self):
         if not self.token:
@@ -471,3 +503,43 @@ class Notes(Endpoint):
         return self._update(payload)
 
     # Default parse update
+
+class EntityFiles(Endpoint):
+    endpoint = "entity-files"
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE] 
+
+    def list(self, opportunity_id: Optional[int] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        print(data["entity_files"][0])
+        data["entity_files"] = [models.EntityFile(**i) for i in data["entity_files"]]
+        return data
+
+    def get(self, entity_file_id: int):
+        self.path = f"entity-files/{entity_file_id}"
+        return self._get()
+
+    def parse_get(self, response: r.Response) -> models.EntityFile:
+        data = response.json()["entity_files"][0] # API response is formatted strangely
+        return models.EntityFile(**data)
+    
+    def download(self, entity_file_id: int, save_path: str): 
+        self.endpoint = f"entity-files/download/{entity_file_id}"
+        return self._download(save_path)
+
+    # Default parse download
+
+    def upload(self, files: Dict[str, io.IOBase], person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id : Optional[int] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload.pop("files", None)
+        has_person = "person_id" in payload
+        has_organization = "organization_id" in payload
+        has_opportunity = "opportunity_id" in payload
+        if sum([has_person, has_organization, has_opportunity]) != 1:
+            raise RequiredPayloadFieldMissing("Must have one of person_id, organization_id, or opportunity_id")
+        return self._upload(files=files, form=payload)
+
+    # Default parse create

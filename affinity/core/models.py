@@ -155,3 +155,18 @@ class Note:
     organization_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list)
 
+@dataclass
+class EntityFile:
+    id: int
+    name: str
+    size: int
+    person_id: int
+    organization_id: int
+    opportunity_id: int
+    uploader_id: int
+    created_at: dt.datetime
+    personId: Optional[int] = None # Duplicate in API response
+    organizationId: Optional[int] = None # Duplicate in API response 
+    opportunityId: Optional[int] = None # Duplicate in API response 
+    createdAt: Optional[dt.datetime] = None # Duplicate in API repsonse
+    uploaderId: Optional[int] = None # Duplicate in API response
