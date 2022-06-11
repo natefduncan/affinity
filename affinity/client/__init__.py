@@ -1,5 +1,5 @@
 from affinity.core.models import *
-from affinity.client.endpoints import Lists, ListEntries, Fields, Notes, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths, Notes, EntityFiles
+from affinity.client.endpoints import Lists, ListEntries, Fields, Notes, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths, Notes, EntityFiles, Reminders, WhoAmI
 from affinity.common.constants import InteractionType
 
 class Client:
@@ -38,3 +38,9 @@ class Client:
 
     def entity_files(self):
         return EntityFiles(self.token)
+
+    def reminders(self):
+        return Reminders(self.token)
+
+    def whoami(self):
+        return WhoAmI(self.token)

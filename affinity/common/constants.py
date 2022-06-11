@@ -43,3 +43,17 @@ class ValueType(IntEnum):
     text = 6
     ranked_dropdown = 7
     opportunity = 8
+
+class ReminderType(IntEnum):
+    one_time = 0
+    recurring = 1
+
+class ReminderResetType(IntEnum):
+    interaction = 0
+    email = 1
+    meeting = 2
+
+class ReminderStatusType(IntEnum):
+    completed = 0
+    active = 1
+    overdue = 2

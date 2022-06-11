@@ -2,7 +2,7 @@ import datetime as dt
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
-from affinity.common.constants import ListType, ActionType, PersonType, EntityType, InteractionType, DirectionType, LoggingType
+from affinity.common.constants import ListType, ActionType, PersonType, EntityType, InteractionType, DirectionType, LoggingType, ReminderType, ReminderResetType, ReminderStatusType
 
 #  https://api-docs.affinity.co/#fields
 @dataclass
@@ -170,3 +170,21 @@ class EntityFile:
     opportunityId: Optional[int] = None # Duplicate in API response 
     createdAt: Optional[dt.datetime] = None # Duplicate in API repsonse
     uploaderId: Optional[int] = None # Duplicate in API response
+
+@dataclass
+class Reminder:
+    id: int
+    creator: Person
+    owner: Person
+    completer: Optional[Person]
+    type: ReminderType
+    reset_type: ReminderResetType
+    status: ReminderStatusType
+    created_at: dt.datetime
+    content: str
+    due_date: dt.datetime
+    completed_at: Optional[dt.datetime]
+    reminder_days: int
+    person: Optional[Person]
+    organization: Optional[Organization]
+    opportunity: Optional[Opportunity]

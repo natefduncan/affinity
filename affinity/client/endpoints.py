@@ -543,3 +543,61 @@ class EntityFiles(Endpoint):
         return self._upload(files=files, form=payload)
 
     # Default parse create
+
+class Reminders(Endpoint):
+    endpoint = "reminders"
+    allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
+    required_payload_fields = ["owner_id", "type"]
+
+    def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None, owner_id: Optional[int] = None, completer_id: Optional[int] = None, type: Optional[int] = None, reset_type: Optional[int] = None, status: Optional[int] = None, due_before: Optional[str] = None, due_after: Optional[str] = None, page_size: Optional[int] = False, page_token: Optional[str] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> dict:
+        data = response.json()
+        data["reminders"] = [models.Reminder(**i) for i in data["reminders"]]
+        return data
+
+    def get(self, reminder_id: int):
+        self.endpoint = f"reminders/{reminder_id}"
+        return self._get()
+
+    def parse_get(self, response: r.Response) -> models.Reminder:
+        return models.Reminder(**response.json())
+
+    def create(self, payload: dict):
+        type = payload.get("type", None)
+        if type:
+            if type == 1:
+                if "reset_type" not in payload:
+                    raise RequiredPayloadFieldMissing("Must specify reset type if type == 1")
+                if "reminder_days" not in payload:
+                    raise RequiredPayloadFieldMissing("Must specify reminder days if type == 1")
+            elif type == 0:
+                if "due_date" not in payload:
+                    raise RequiredPayloadFieldMissing("Must specify due date if type == 0")
+        return self._create(payload)
+
+    def parse_create(self, response: r.Response) -> models.Reminder:
+        return models.Reminder(**response.json())
+
+    def delete(self, reminder_id: int):
+        self.endpoint = f"reminders/{reminder_id}"
+        return self._delete()
+
+    # Default parse delete
+
+    def update(self, reminder_id: int, payload: dict):
+        self.endpoint = f"reminders/{reminder_id}"
+        return self._update(payload)
+
+    # Default parse update
+
+class WhoAmI(Endpoint):
+    endpoint = "auth/whoami"
+    allowed_request_types = [RequestType.GET]
+
+    def get(self):
+        return self._get()
+    
+    # Default parse get
