@@ -74,22 +74,13 @@ class FieldValue:
     list_entry_id: int
     value: Value
 
-#  https://api-docs.affinity.co/#the-field-value-change-resource
-@dataclass
-class FieldValueChange:
-    id: int
-    field_id: int
-    entity_id: int
-    list_entry_id: int
-    action_type: ActionType
-    value: Value
-
-#  https://api-docs.affinity.co/#persons
+ #  https://api-docs.affinity.co/#persons
 @dataclass
 class ShortInteraction:
     date: dt.datetime
     person_ids: list[int]
-        
+
+       
 @dataclass
 class Person:
     id: int
@@ -103,6 +94,22 @@ class Person:
     list_entries: list[ListEntry] = field(default_factory=list) 
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
     interactions: Dict[str, ShortInteraction] = field(default_factory=dict)
+
+#  https://api-docs.affinity.co/#the-field-value-change-resource
+@dataclass
+class FieldValueChange:
+    id: int
+    field_id: int
+    entity_id: int
+    entity_attribute_id: int
+    changer: Person
+    changed_at: dt.datetime
+    list_entry_id: int
+    action_type: ActionType
+    value: Value
+    person: Optional[dict]
+    company: Optional[dict]
+    opp: Optional[dict]
 
 @dataclass_json
 @dataclass
@@ -188,3 +195,10 @@ class Reminder:
     person: Optional[Person]
     organization: Optional[Organization]
     opportunity: Optional[Opportunity]
+
+@dataclass
+class Webhook:
+    id: int
+    webhook_url: str
+    subscriptions: list[str]
+    disabled: bool

@@ -601,3 +601,56 @@ class WhoAmI(Endpoint):
         return self._get()
     
     # Default parse get
+
+class FieldValueChanges(Endpoint):
+    endpoint = "field-value-changes"
+    allowed_request_types = [RequestType.LIST]
+
+    def list(self, field_id: int, action_type: Optional[int] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, list_entry_id: Optional[int] = None):
+        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._list(query_params=query_params)
+
+    def parse_list(self, response: r.Response) -> List[models.FieldValueChange]:
+        fields = Fields(self.token).list()
+        fvs = []
+        for fv in response.json():
+            value = parse_value(fields, fv)
+            fv.update({"value": value})
+            print(fv)
+            fvs.append(models.FieldValueChange(**fv))
+        return fvs
+
+class Webhooks(Endpoint):
+    endpoint = "webhook"
+    allowed_request_types = [RequestType.LIST, RequestType.GET, RequestType.CREATE, RequestType.UPDATE, RequestType.DELETE]
+
+    def list(self):
+        return self._list(query_params={})
+
+    def parse_list(self, response: r.Response) -> List[models.Webhook]:
+        return [models.Webhook(**i) for i in response.json()]
+
+    def get(self, webhook_subscription_id: int):
+        self.endpoint = f"webhook/{webhook_subscription_id}"
+        return self._get()
+
+    def parse_get(self, response: r.Response) -> models.Webhook:
+        return models.Webhook(**response.json())
+
+    def create(self, webhook_url: str, subscriptions: List[str] = []):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._create(payload)
+
+    # Default parse create
+
+    def update(self, webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._update(payload)
+
+    # Default parse update
+
+    def delete(self, webhook_subscription_id: int):
+        self.endpoint = f"webhook/{webhook_subscription_id}"
+        return self._delete()
+
+    # Default parse delete

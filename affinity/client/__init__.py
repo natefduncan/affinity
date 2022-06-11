@@ -1,5 +1,5 @@
 from affinity.core.models import *
-from affinity.client.endpoints import Lists, ListEntries, Fields, Notes, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths, Notes, EntityFiles, Reminders, WhoAmI
+from affinity.client.endpoints import Lists, ListEntries, Fields, Notes, Persons, Organizations, Interactions, FieldValues, Opportunities, RelationshipsStrengths, Notes, EntityFiles, Reminders, Webhooks, WhoAmI, FieldValueChanges
 from affinity.common.constants import InteractionType
 
 class Client:
@@ -44,3 +44,9 @@ class Client:
 
     def whoami(self):
         return WhoAmI(self.token)
+
+    def field_value_changes(self):
+        return FieldValueChanges(self.token)
+
+    def webhooks(self):
+        return Webhooks(self.token)
