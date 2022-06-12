@@ -6,7 +6,7 @@ from enum import Enum
 from dataclasses import asdict
 from typing import List, Optional, Dict
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
-from affinity.common.constants import EntityType, InteractionType, ValueType
+from affinity.common.constants import EntityType, InteractionType, ReminderResetType, ReminderType, ValueType
 from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
@@ -586,8 +586,8 @@ class Reminders(Endpoint):
     def parse_get(self, response: r.Response) -> models.Reminder:
         return models.Reminder(**response.json())
 
-    def create(self, payload: dict):
-        type = payload.get("type", None)
+    def create(self, owner_id: int, type: ReminderType, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
         if type:
             if type == 1:
                 if "reset_type" not in payload:
@@ -608,7 +608,9 @@ class Reminders(Endpoint):
 
     # Default parse delete
 
-    def update(self, reminder_id: int, payload: dict):
+    def update(self, reminder_id: int, owner_id: Optional[int] = None, type: Optional[ReminderType] = None, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload.pop("reminder_id", None)
         self.endpoint = f"reminders/{reminder_id}"
         return self._update(payload)
 
