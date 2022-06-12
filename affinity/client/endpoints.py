@@ -4,7 +4,7 @@ import requests as r
 from enum import Enum
 from typing import List, Optional, Dict
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
-from affinity.common.constants import InteractionType, ValueType
+from affinity.common.constants import EntityType, InteractionType, ValueType
 from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
@@ -216,7 +216,6 @@ class Fields(Endpoint):
     required_payload_fields = ["name", "entity_type", "value_type"]
 
     def list(self, list_id: Optional[int] = None, value_type: Optional[int] = None, with_modified_names: Optional[bool] = False):
-        query_params = {k: v for k,v in locals().get("kwargs", {}).items() if v}
         query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
@@ -224,6 +223,9 @@ class Fields(Endpoint):
         return [models.Field(**i) for i in response.json()]
     
     # Default create
+    def create(self, name: str, entity_type: EntityType, value_type: ValueType, list_id: Optional[int] = None, allows_multiple: Optional[bool] = None, is_list_specific: Optional[bool] = None, is_required : Optional[bool] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._create(payload)
 
     def parse_create(self, response: r.Response) -> models.Field:
         return models.Field(**response.json())
