@@ -103,6 +103,6 @@ client.whoami().get()
 client.webhooks().list()
 client.webhooks().get(webhook_subscription_id: int)
 client.webhooks().create(webhook_url: str, subscriptions: List[str] = [])
-client.webhooks().update(webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None)
+client.webhooks().update(webhook_subscription_id: int, webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None)
 client.webhooks().delete(webhook_subscription_id: int)
 ```
