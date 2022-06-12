@@ -21,7 +21,6 @@ class RequestType(Enum):
 class Endpoint:
     endpoint : str = ""
     allowed_request_types: List[RequestType] = []
-    required_payload_fields: List[str] = []
     required_query_params: List[str] = []
     
     def __init__(self, token: str):
@@ -35,11 +34,6 @@ class Endpoint:
         for r in self.required_query_params:
             if r not in params:
                 raise RequiredQueryParamMissing(r) 
-
-    def verify_payload_fields(self, data: dict):
-        for f in self.required_payload_fields:
-            if f not in data:
-                raise RequiredPayloadFieldMissing(f)
 
     def _get(self):
         if not self.token:
@@ -97,7 +91,6 @@ class Endpoint:
         if RequestType.CREATE not in self.allowed_request_types:
             raise RequestTypeNotAllowed
         headers = {"Content-Type" : "application/json"}
-        self.verify_payload_fields(payload)
         url = self.construct_url({})
         response = r.post(url=url, json=payload, headers=headers, auth=("", self.token))
         if response.status_code != 200:
@@ -192,14 +185,14 @@ class ListEntries(Endpoint):
 
     def list(self, page_size: Optional[int] = None, page_token: Optional[str] = None):
         self.endpoint = f"lists/{self.list_id}/list-entries"
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.ListEntry]:
         return [models.ListEntry(**i) for i in response.json()]
 
     def create(self, entity_id: int, creator_id: Optional[int] = False):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         self.endpoint = f"lists/{self.list_id}/list-entries"
         return self._create(payload)
 
@@ -215,10 +208,9 @@ class ListEntries(Endpoint):
 class Fields(Endpoint):
     endpoint = "fields"
     allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
-    required_payload_fields = ["name", "entity_type", "value_type"]
 
     def list(self, list_id: Optional[int] = None, value_type: Optional[int] = None, with_modified_names: Optional[bool] = False):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.Field]:
@@ -226,7 +218,7 @@ class Fields(Endpoint):
     
     # Default create
     def create(self, name: str, entity_type: EntityType, value_type: ValueType, list_id: Optional[int] = None, allows_multiple: Optional[bool] = None, is_list_specific: Optional[bool] = None, is_required : Optional[bool] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._create(payload)
 
     def parse_create(self, response: r.Response) -> models.Field:
@@ -265,10 +257,9 @@ def parse_value(fields, field_value) -> models.Value:
 class FieldValues(Endpoint):
     endpoint = "field-values"
     allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
-    required_payload_fields = ["field_id", "entity_id", "value"]
 
     def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, list_entry_id: Optional[int] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         if not query_params:
             raise RequiredQueryParamMissing("Must have person_id, organization_id, opportunity_id, or list_entry_id")
         if len(query_params) != 1:
@@ -291,7 +282,7 @@ class FieldValues(Endpoint):
         return fvs 
 
     def create(self, field_id: int, entity_id: int, value: models.Value, list_entry_id: Optional[int] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         value = [v for v in asdict(value).values() if v][0]
         payload["value"] = value 
         return self._create(payload)
@@ -309,11 +300,9 @@ class FieldValues(Endpoint):
         })
 
     def update(self, field_value_id: int, value: models.Value):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
         value = [v for v in asdict(value).values() if v][0]
-        payload["value"] = value 
         self.endpoint = f"field-values/{field_value_id}"
-        return self._update(payload)
+        return self._update({"value": value})
 
     # Default parse update
 
@@ -326,11 +315,10 @@ class FieldValues(Endpoint):
 class Persons(Endpoint):
     endpoint = "persons"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
-    required_payload_fields = ["first_name", "last_name", "emails"]
 
     # TODO: Impl min&max_{interaction_type}_date query parms
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -348,7 +336,7 @@ class Persons(Endpoint):
         return models.Person(**response.json())
  
     def create(self, first_name: str, last_name: str, emails: List[str], organization_ids: List[int] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._create(payload)
 
     def parse_create(self, response: r.Response) -> models.Person:
@@ -361,7 +349,8 @@ class Persons(Endpoint):
     # Default parse delete
 
     def update(self, person_id: int, first_name: Optional[str] = None, last_name: Optional[str] = None, emails: List[str] = [], organization_ids: List[int] = []): 
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
+        payload.pop("person_id", None)
         self.endpoint = f"persons/{person_id}"
         return self._update(payload)
 
@@ -370,11 +359,10 @@ class Persons(Endpoint):
 class Organizations(Endpoint):
     endpoint = "organizations"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
-    required_payload_fields = ["name"]
 
     # TODO: Impl min&max_{interaction_type}_date query params
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -392,7 +380,7 @@ class Organizations(Endpoint):
         return models.Organization.from_dict(response.json())
 
     def create(self, name: str, domain: Optional[str] = None, person_ids: List[int] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._create(payload)
 
     def parse_create(self, response: r.Response) -> models.Organization:
@@ -405,7 +393,8 @@ class Organizations(Endpoint):
     # Default parse delete
 
     def update(self, organization_id: int, name: Optional[str] = None, domain: Optional[str] = None, person_ids: List[int] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
+        payload.pop("organization_id", None)
         self.endpoint = f"organizations/{organization_id}"
         return self._update(payload)
 
@@ -414,10 +403,9 @@ class Organizations(Endpoint):
 class Opportunities(Endpoint):
     endpoint = "opportunities"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
-    required_payload_fields = ["name", "list_id"]
 
     def list(self, term: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -435,7 +423,7 @@ class Opportunities(Endpoint):
         return models.Opportunity(**response.json())
 
     def create(self, name: str, list_id: int, person_ids: List[int] = [], organization_ids: List[int] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._create(payload)
     
     def parse_create(self, response: r.Response) -> models.Opportunity:
@@ -448,7 +436,8 @@ class Opportunities(Endpoint):
     # Default parse delete
 
     def update(self, opportunity_id: int, name: Optional[str], person_ids: List[int] = [], organization_ids: List[int] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
+        payload.pop("opportunity_id", None)
         self.endpoint = f"opportunities/{opportunity_id}"
         return self._update(payload)
 
@@ -475,7 +464,7 @@ class RelationshipsStrengths(Endpoint):
     required_query_params = ["external_id"]
 
     def list(self, external_id: int, internal_id: Optional[int] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.RelationshipStrength]:
@@ -486,7 +475,7 @@ class Notes(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
 
     def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -501,8 +490,8 @@ class Notes(Endpoint):
     def parse_get(self, response: r.Response) -> models.Note:
         return models.Note(**response.json())
 
-    def create(self, person_ids: List[int] = [], organization_ids: List[int] = [], opportunity_id: List[int] = [], content: Optional[str] = None, gmail_id: Optional[str] = None, creator_id: Optional[int] = None, created_at: Optional[dt.datetime] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+    def create(self, person_ids: List[int] = [], organization_ids: List[int] = [], opportunity_ids: List[int] = [], content: Optional[str] = None, gmail_id: Optional[str] = None, creator_id: Optional[int] = None, created_at: Optional[dt.datetime] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         # Must have either gmail_id or content
         if "content" not in payload and "gmail_id" not in payload:
             raise RequiredPayloadFieldMissing("Must have either 'content' or 'gmail_id' in payload")
@@ -530,7 +519,7 @@ class EntityFiles(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE] 
 
     def list(self, opportunity_id: Optional[int] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -554,7 +543,7 @@ class EntityFiles(Endpoint):
     # Default parse download
 
     def upload(self, files: Dict[str, io.IOBase], person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id : Optional[int] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         payload.pop("files", None)
         has_person = "person_id" in payload
         has_organization = "organization_id" in payload
@@ -568,10 +557,9 @@ class EntityFiles(Endpoint):
 class Reminders(Endpoint):
     endpoint = "reminders"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
-    required_payload_fields = ["owner_id", "type"]
 
     def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None, owner_id: Optional[int] = None, completer_id: Optional[int] = None, type: Optional[int] = None, reset_type: Optional[int] = None, status: Optional[int] = None, due_before: Optional[str] = None, due_after: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
@@ -587,7 +575,7 @@ class Reminders(Endpoint):
         return models.Reminder(**response.json())
 
     def create(self, owner_id: int, type: ReminderType, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         if type:
             if type == 1:
                 if "reset_type" not in payload:
@@ -609,7 +597,7 @@ class Reminders(Endpoint):
     # Default parse delete
 
     def update(self, reminder_id: int, owner_id: Optional[int] = None, type: Optional[ReminderType] = None, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         payload.pop("reminder_id", None)
         self.endpoint = f"reminders/{reminder_id}"
         return self._update(payload)
@@ -630,7 +618,7 @@ class FieldValueChanges(Endpoint):
     allowed_request_types = [RequestType.LIST]
 
     def list(self, field_id: int, action_type: Optional[int] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, list_entry_id: Optional[int] = None):
-        query_params = {k: v for k,v in locals().items() if k != "self" and v}
+        query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> List[models.FieldValueChange]:
@@ -639,7 +627,6 @@ class FieldValueChanges(Endpoint):
         for fv in response.json():
             value = parse_value(fields, fv)
             fv.update({"value": value})
-            print(fv)
             fvs.append(models.FieldValueChange(**fv))
         return fvs
 
@@ -661,13 +648,15 @@ class Webhooks(Endpoint):
         return models.Webhook(**response.json())
 
     def create(self, webhook_url: str, subscriptions: List[str] = []):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._create(payload)
 
     # Default parse create
 
-    def update(self, webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None):
-        payload = {k: v for k,v in locals().items() if k != "self" and v}
+    def update(self, webhook_subscription_id: int, webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v != None}
+        payload.pop("webhook_subscription_id", None)
+        self.endpoint = "webhook/{webhook_subscription_id}"
         return self._update(payload)
 
     # Default parse update

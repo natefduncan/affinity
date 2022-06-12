@@ -10,9 +10,7 @@ def create_list_entry():
     orgs = client.organizations().list()
     list_entry = client \
     .list_entries(list_id=test_list.id) \
-    .create(data={
-        "entity_id": orgs["organizations"][0].id
-    })
+    .create(entity_id=orgs["organizations"][0].id)
     return {
             "list_id" : test_list.id, 
             "list_entry_id" : list_entry.id 
@@ -25,4 +23,4 @@ def delete_list_entry(list_id, list_entry_id):
 
 if __name__=="__main__":
    d = create_list_entry()
-   #  delete_list_entry(d["list_id"], d["list_entry_id"])
+   delete_list_entry(d["list_id"], d["list_entry_id"])

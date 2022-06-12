@@ -11,24 +11,24 @@ def create_reminder():
     owner = client.whoami().get()
     reminder = client \
     .reminders() \
-    .create(payload={
-        "content": "Test Reminder",
-        "type" : ReminderType.one_time,
-        "due_date" : "2022-12-31", 
-        "opportunity_id": opportunity.entity_id, 
-        "owner_id" : owner["user"]["id"]
-    })
+    .create(
+        content="Test Reminder",
+        type=ReminderType.one_time,
+        due_date="2022-12-31", 
+        opportunity_id=opportunity.entity_id, 
+        owner_id=owner["user"]["id"]
+    )
     return reminder 
 
 def delete_reminder(reminder_id):
     client = Client(AFFINITY_TOKEN)
     return client.reminders().delete(reminder_id)
 
-def update_reminder(reminder_id, payload):
+def update_reminder(reminder_id, content):
     client = Client(AFFINITY_TOKEN)
-    return client.reminders().update(reminder_id, payload)
+    return client.reminders().update(reminder_id, content=content)
 
 if __name__=="__main__":
    d = create_reminder()
-   update_reminder(d.id, {"content":"Test Reminder 2"})
+   update_reminder(d.id, content="Test Reminder 2")
    delete_reminder(d.id)

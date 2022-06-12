@@ -10,12 +10,12 @@ def create_field():
     test_list = [l for l in many if l.name.lower() == "test"][0]
     field = client \
     .fields() \
-    .create(payload={
-        "name": "Test Field",
-        "entity_type": EntityType.organization, 
-        "value_type": ValueType.text, 
-        "list_id": test_list.id
-        })
+    .create(
+        name="Test Field",
+        entity_type=EntityType.organization, 
+        value_type=ValueType.text, 
+        list_id=test_list.id
+        )
     return field
 
 def delete_field(field_id):
@@ -24,4 +24,4 @@ def delete_field(field_id):
 
 if __name__=="__main__":
    d = create_field()
-   #  delete_field(d.id)
+   delete_field(d.id)

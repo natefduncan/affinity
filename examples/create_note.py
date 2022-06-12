@@ -10,21 +10,21 @@ def create_note():
     opportunity = client.list_entries(list_id=test_list.id).list()[0]
     note = client \
     .notes() \
-    .create(payload={
-        "opportunity_ids" : [opportunity.entity_id],
-        "content": "Test Note",
-    })
+    .create(
+        opportunity_ids=[opportunity.entity_id],
+        content="Test Note",
+    )
     return note 
 
 def delete_note(note_id):
     client = Client(AFFINITY_TOKEN)
     return client.notes().delete(note_id)
 
-def update_note(note_id, payload):
+def update_note(note_id, content):
     client = Client(AFFINITY_TOKEN)
-    return client.notes().update(note_id, payload)
+    return client.notes().update(note_id, content)
 
 if __name__=="__main__":
    d = create_note()
-   update_note(d.id, {"content":"Test Note 2"})
+   update_note(d.id, content="Test Note 2")
    delete_note(d.id)
