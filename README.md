@@ -79,7 +79,7 @@ client.relationships_strengths().list(external_id: int, internal_id: Optional[in
 # Notes
 client.notes().list(person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None)
 client.notes().get(note_id: int)
-client.notes().create(person_ids: List[int] = [], organization_ids: List[int] = [], opportunity_id: List[int] = [], content: Optional[str] = None, gmail_id: Optional[str] = None, creator_id: Optional[int] = None, created_at: Optional[dt.datetime] = None)
+client.notes().create(person_ids: List[int] = [], organization_ids: List[int] = [], opportunity_ids: List[int] = [], content: Optional[str] = None, gmail_id: Optional[str] = None, creator_id: Optional[int] = None, created_at: Optional[dt.datetime] = None)
 client.notes().update(note_id: int, content: str)
 client.notes().delete(note_id: int)
 
@@ -105,5 +105,4 @@ client.webhooks().get(webhook_subscription_id: int)
 client.webhooks().create(webhook_url: str, subscriptions: List[str] = [])
 client.webhooks().update(webhook_url: Optional[str] = None, subscriptions: List[str] = [], disabled: Optional[bool] = None)
 client.webhooks().delete(webhook_subscription_id: int)
-
 ```
