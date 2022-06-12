@@ -8,10 +8,10 @@ def create_opportunity():
     test_list = [i for i in client.lists().list() if "Test 2" in i.name][0]
     opportunity = client \
     .opportunities() \
-    .create(payload={
-        "list_id": test_list.id, 
-        "name": "Test Opportunity",
-        })
+    .create(
+        list_id=test_list.id, 
+        name="Test Opportunity",
+        )
     return opportunity 
 
 def delete_opportunity(opportunity_id):

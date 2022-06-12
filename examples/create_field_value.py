@@ -9,27 +9,27 @@ def create_field(list_id):
     client = Client(AFFINITY_TOKEN)
     field = client \
     .fields() \
-    .create(payload={
-        "name": "Test Field",
-        "entity_type": EntityType.organization, 
-        "value_type": ValueType.text, 
-        "list_id": list_id, 
-        "is_list_specific" : True
-        })
+    .create(
+        name="Test Field",
+        entity_type=EntityType.organization, 
+        value_type=ValueType.text, 
+        list_id=list_id, 
+        is_list_specific=True
+        )
     return field
 
 def create_field_value(field_id, list_entry_id, entity_id):
    client = Client(AFFINITY_TOKEN)
-   return client.field_values().create({
-       "field_id" : field_id, 
-       "entity_id" : entity_id,
-       "list_entry_id" : list_entry_id, 
-       "value" : "Test Field Value"
-    })
+   return client.field_values().create(
+       field_id=field_id, 
+       entity_id=entity_id,
+       list_entry_id=list_entry_id, 
+       value=models.Value(text="Test Field Value")
+    )
       
 def update_field_value(field_value_id):
     client = Client(AFFINITY_TOKEN)
-    return client.field_values().update(field_value_id, payload={"value": "Test Field Value 2"})
+    return client.field_values().update(field_value_id, value=models.Value(text="Test Field Value 2"))
 
 def delete_field(field_id):
     client = Client(AFFINITY_TOKEN)
@@ -54,6 +54,3 @@ if __name__=="__main__":
     # Delete
     delete_field_value(field_value.id)
     delete_field(field.id)
-
-    
-   #  delete_field(d.id)

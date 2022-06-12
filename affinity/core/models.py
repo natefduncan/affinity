@@ -56,15 +56,15 @@ class Location:
 
 @dataclass
 class Value:
-    dropdown: Optional[str]
-    number: Optional[int]
-    person: Optional[int]
-    organization: Optional[int]
-    location: Optional[Location]
-    date: Optional[dt.datetime]
-    text: Optional[str]
-    opportunity: Optional[str]
-    ranked_dropdown: Optional[str]
+    dropdown: Optional[str] = None
+    number: Optional[int] = None
+    person: Optional[int] = None
+    organization: Optional[int] = None
+    location: Optional[Location] = None
+    date: Optional[dt.datetime] = None
+    text: Optional[str] = None
+    opportunity: Optional[int] = None
+    ranked_dropdown: Optional[str] = None
 
 @dataclass
 class FieldValue:

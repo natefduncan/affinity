@@ -8,11 +8,11 @@ def create_person():
     client = Client(AFFINITY_TOKEN)
     person = client \
     .persons() \
-    .create(payload={
-        "first_name": "Test",
-        "last_name" : "Person", 
-        "emails" : ["test@email.com"]
-        })
+    .create(
+        first_name="Test",
+        last_name="Person", 
+        emails= ["test@email.com"]
+        )
     return person 
 
 def delete_person(person_id):
