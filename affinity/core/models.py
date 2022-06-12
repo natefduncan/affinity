@@ -63,7 +63,7 @@ class Value:
     location: Optional[Location]
     date: Optional[dt.datetime]
     text: Optional[str]
-    opportunity: Optional[str]
+    opportunity: Optional[int]
     ranked_dropdown: Optional[str]
 
 @dataclass

@@ -2,6 +2,7 @@ import mimetypes
 import io
 import requests as r
 from enum import Enum
+from dataclasses import asdict
 from typing import List, Optional, Dict
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
 from affinity.common.constants import EntityType, InteractionType, ValueType
@@ -288,7 +289,11 @@ class FieldValues(Endpoint):
             )
         return fvs 
 
-    # Default create
+    def create(self, field_id: int, entity_id: int, value: models.Value, list_entry_id: Optional[int] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        value = [v for v in asdict(value).values() if v][0]
+        payload["value"] = value 
+        return self._create(payload)
     
     def parse_create(self, response: r.Response) -> models.FieldValue:
         fields = Fields(self.token).list()
@@ -302,7 +307,10 @@ class FieldValues(Endpoint):
             "value" : value
         })
 
-    def update(self, field_value_id: int, payload: dict):
+    def update(self, field_value_id: int, value: models.Value):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        value = [v for v in asdict(value).values() if v][0]
+        payload["value"] = value 
         self.endpoint = f"field-values/{field_value_id}"
         return self._update(payload)
 
