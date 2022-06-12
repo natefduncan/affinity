@@ -415,7 +415,7 @@ class Opportunities(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
     required_payload_fields = ["name", "list_id"]
 
-    def list(self, term: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
+    def list(self, term: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
         query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
@@ -433,7 +433,10 @@ class Opportunities(Endpoint):
     def parse_get(self, response: r.Response) -> models.Opportunity:
         return models.Opportunity(**response.json())
 
-    # Default create
+    def create(self, name: str, list_id: int, person_ids: List[int] = [], organization_ids: List[int] = []):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._create(payload)
+    
     def parse_create(self, response: r.Response) -> models.Opportunity:
         return models.Opportunity(**response.json())
 
@@ -443,7 +446,8 @@ class Opportunities(Endpoint):
 
     # Default parse delete
 
-    def update(self, opportunity_id: int, payload: dict):
+    def update(self, opportunity_id: int, name: Optional[str], person_ids: List[int] = [], organization_ids: List[int] = []):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
         self.endpoint = f"opportunities/{opportunity_id}"
         return self._update(payload)
 
