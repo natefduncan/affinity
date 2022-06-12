@@ -196,7 +196,8 @@ class ListEntries(Endpoint):
     def parse_list(self, response: r.Response) -> List[models.ListEntry]:
         return [models.ListEntry(**i) for i in response.json()]
 
-    def create(self, payload: dict):
+    def create(self, entity_id: int, creator_id: Optional[int] = False):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
         self.endpoint = f"lists/{self.list_id}/list-entries"
         return self._create(payload)
 
