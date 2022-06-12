@@ -1,4 +1,5 @@
 import mimetypes
+import datetime as dt
 import io
 import requests as r
 from enum import Enum
@@ -500,7 +501,8 @@ class Notes(Endpoint):
     def parse_get(self, response: r.Response) -> models.Note:
         return models.Note(**response.json())
 
-    def create(self, payload: dict):
+    def create(self, person_ids: List[int] = [], organization_ids: List[int] = [], opportunity_id: List[int] = [], content: Optional[str] = None, gmail_id: Optional[str] = None, creator_id: Optional[int] = None, created_at: Optional[dt.datetime] = None):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
         # Must have either gmail_id or content
         if "content" not in payload and "gmail_id" not in payload:
             raise RequiredPayloadFieldMissing("Must have either 'content' or 'gmail_id' in payload")
@@ -515,13 +517,11 @@ class Notes(Endpoint):
 
     # Default parse delete
 
-    def update(self, note_id: int, payload: dict):
+    def update(self, note_id: int, content: str):
         #  You cannot update the content of a note that has mentions. 
         #  You also cannot update the content of a note associated with an email.
-        if "content" not in payload:
-            raise RequiredPayloadFieldMissing("Must have 'content' in payload")
         self.endpoint = f"notes/{note_id}"
-        return self._update(payload)
+        return self._update({"content" : content})
 
     # Default parse update
 
@@ -570,7 +570,7 @@ class Reminders(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
     required_payload_fields = ["owner_id", "type"]
 
-    def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None, owner_id: Optional[int] = None, completer_id: Optional[int] = None, type: Optional[int] = None, reset_type: Optional[int] = None, status: Optional[int] = None, due_before: Optional[str] = None, due_after: Optional[str] = None, page_size: Optional[int] = False, page_token: Optional[str] = None):
+    def list(self, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None, owner_id: Optional[int] = None, completer_id: Optional[int] = None, type: Optional[int] = None, reset_type: Optional[int] = None, status: Optional[int] = None, due_before: Optional[str] = None, due_after: Optional[str] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
         query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
