@@ -372,13 +372,12 @@ class Organizations(Endpoint):
     required_payload_fields = ["name"]
 
     # TODO: Impl min&max_{interaction_type}_date query params
-    def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = ""):
+    def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
         query_params = {k: v for k,v in locals().items() if k != "self" and v}
         return self._list(query_params=query_params)
 
     def parse_list(self, response: r.Response) -> dict:
         data = response.json()
-        print(data["organizations"][0].keys())
         return {
             "organizations" : [models.Organization.from_dict(i) for i in data["organizations"]],
             "next_page_token" : data["next_page_token"]
@@ -391,7 +390,10 @@ class Organizations(Endpoint):
     def parse_get(self, response: r.Response) -> models.Organization:
         return models.Organization.from_dict(response.json())
 
-    # Default create
+    def create(self, name: str, domain: Optional[str] = None, person_ids: List[int] = []):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
+        return self._create(payload)
+
     def parse_create(self, response: r.Response) -> models.Organization:
         return models.Organization.from_dict(response.json())
 
@@ -401,7 +403,8 @@ class Organizations(Endpoint):
 
     # Default parse delete
 
-    def update(self, organization_id: int, payload: dict):
+    def update(self, organization_id: int, name: Optional[str] = None, domain: Optional[str] = None, person_ids: List[int] = []):
+        payload = {k: v for k,v in locals().items() if k != "self" and v}
         self.endpoint = f"organizations/{organization_id}"
         return self._update(payload)
 
