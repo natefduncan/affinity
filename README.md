@@ -92,7 +92,7 @@ client.entity_files().upload(files: Dict[str, io.IOBase], person_id: Optional[in
 # Reminders
 client.reminders().list(person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = None, creator_id: Optional[int] = None, owner_id: Optional[int] = None, completer_id: Optional[int] = None, type: Optional[int] = None, reset_type: Optional[int] = None, status: Optional[int] = None, due_before: Optional[str] = None, due_after: Optional[str] = None, page_size: Optional[int] = False, page_token: Optional[str] = None)
 client.reminders().get(reminder_id: int)
-client.reminders().create(owner_id: int, type: ReminderType, content: Optional[str] = Non      e, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None)
+client.reminders().create(owner_id: int, type: ReminderType, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None)
 client.reminders().update(reminder_id: int, owner_id: Optional[int] = None, type: Optional[ReminderType] = None, content: Optional[str] = None, reset_type: Optional[ReminderResetType] = None, person_id: Optional[int] = None, organization_id: Optional[int] = None, opportunity_id: Optional[int] = False, due_date : Optional[str] = None, reminder_days: Optional[int] = None, is_completed: Optional[int] = None)
 client.reminders().delete(reminder_id: int)
 
