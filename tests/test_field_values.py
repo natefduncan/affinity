@@ -5,8 +5,7 @@ from affinity.core import models
 
 AFFINITY_TOKEN = os.getenv("AFFINITY_TOKEN")
 
-def test_field_values_list():
-    client = Client(AFFINITY_TOKEN)
+def test_field_values_list(client):
     many = client.lists().list()
     test_list = [l for l in many if l.name.lower() == "test"][0]
     list_entry = client.list_entries(list_id=test_list.id).list()[0]

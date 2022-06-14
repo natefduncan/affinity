@@ -8,8 +8,7 @@ import pytest
 AFFINITY_TOKEN = os.getenv("AFFINITY_TOKEN")
 
 @pytest.mark.skip(reason="no way of currently testing this")
-def test_interactions_list():
-    client = Client(AFFINITY_TOKEN)
+def test_interactions_list(client):
     many = client.interactions(type=InteractionType.email).list()
     assert isinstance(many["email"][0], models.EmailInteraction)
 
