@@ -1,12 +1,9 @@
 import os
 from pathlib import Path
-from affinity import Client
-from typing import List
+
 from affinity.core import models
 
 from definitions import ROOT_DIR
-
-AFFINITY_TOKEN = os.getenv("AFFINITY_TOKEN")
 
 def test_entity_files_list(client):
     many = client.entity_files().list()
