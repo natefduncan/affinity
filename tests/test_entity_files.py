@@ -1,9 +1,11 @@
 import os
+import pathlib
 from pathlib import Path
 
 from affinity.core import models
 
-from definitions import ROOT_DIR
+# from definitions import ROOT_DIR
+ROOT_DIR = pathlib.Path(__file__).parent.parent.absolute()
 
 def test_entity_files_list(client):
     many = client.entity_files().list()

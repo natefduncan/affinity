@@ -3,9 +3,11 @@ import os
 from affinity import Client
 from affinity.common.constants import ListType
 
+
 @pytest.fixture
 def client():
     return Client(os.getenv("AFFINITY_TOKEN", ""))
+
 
 @pytest.fixture
 def opportunity_list(client):
@@ -15,6 +17,7 @@ def opportunity_list(client):
     else:
         raise RuntimeError("Your affinity environment must have an opportunity list for tests to work. The affinity API cannot create lists.")
 
+
 @pytest.fixture
 def organization_list(client):
     organization_lists = [i for i in client.lists().list() if i.type == ListType.organization and "test" in i.name.lower()]
@@ -22,6 +25,7 @@ def organization_list(client):
         return organization_lists[0]
     else:
         raise RuntimeError("Your affinity environment must have an organization list for tests to work. The affinity API cannot create lists.")
+
 
 @pytest.fixture
 def person_list(client):

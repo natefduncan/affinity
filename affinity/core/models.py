@@ -32,6 +32,7 @@ class List:
     public: bool
     owner_id: int
     list_size: int
+    creator_id: int
     fields: list[Field] = field(default_factory=list) 
 
 #  https://api-docs.affinity.co/#list-entries
