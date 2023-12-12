@@ -2,7 +2,20 @@ import datetime as dt
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
-from affinity.common.constants import ListType, ActionType, PersonType, EntityType, InteractionType, DirectionType, LoggingType, ReminderType, ReminderResetType, ReminderStatusType
+from affinity.common.constants import (
+    ListType,
+    ActionType,
+    PersonType,
+    EntityType,
+    InteractionType,
+    DirectionType,
+    LoggingType,
+    ReminderType,
+    ReminderResetType,
+    ReminderStatusType,
+    NoteCreationType
+)
+
 
 #  https://api-docs.affinity.co/#fields
 @dataclass
@@ -11,6 +24,7 @@ class DropdownOption:
     text: str
     rank: int
     color: int
+
 
 @dataclass
 class Field:
@@ -22,6 +36,7 @@ class Field:
     allows_multiple: bool
     dropdown_options: list[DropdownOption]
     value_type: int
+
 
 #  https://api-docs.affinity.co/#lists
 @dataclass
@@ -35,6 +50,7 @@ class List:
     creator_id: int
     fields: list[Field] = field(default_factory=list) 
 
+
 #  https://api-docs.affinity.co/#list-entries
 @dataclass
 class ListEntry:
@@ -46,6 +62,7 @@ class ListEntry:
     created_at: dt.datetime
     entity: Optional[Any] = None
 
+
 #  https://api-docs.affinity.co/#the-field-value-resource
 @dataclass
 class Location:
@@ -54,6 +71,7 @@ class Location:
     state: Optional[str]
     country: Optional[str]
     continent: Optional[str]
+
 
 @dataclass
 class Value:
@@ -67,6 +85,7 @@ class Value:
     opportunity: Optional[int] = None
     ranked_dropdown: Optional[str] = None
 
+
 @dataclass
 class FieldValue:
     id: int
@@ -74,6 +93,7 @@ class FieldValue:
     entity_id: int
     list_entry_id: int
     value: Value
+
 
  #  https://api-docs.affinity.co/#persons
 @dataclass
@@ -96,6 +116,7 @@ class Person:
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
     interactions: Dict[str, ShortInteraction] = field(default_factory=dict)
 
+
 #  https://api-docs.affinity.co/#the-field-value-change-resource
 @dataclass
 class FieldValueChange:
@@ -112,6 +133,7 @@ class FieldValueChange:
     company: Optional[dict]
     opp: Optional[dict]
 
+
 @dataclass_json
 @dataclass
 class Organization:
@@ -125,6 +147,7 @@ class Organization:
     opportunity_ids: list[int] = field(default_factory=list) 
     list_entries: list[ListEntry] = field(default_factory=list)
 
+
 @dataclass
 class EmailInteraction:
     date: dt.datetime
@@ -136,6 +159,7 @@ class EmailInteraction:
     cc: list[Person]
     direction: DirectionType
 
+
 @dataclass
 class Opportunity:
     id: int
@@ -144,11 +168,13 @@ class Opportunity:
     organization_ids: list[int] = field(default_factory=list)
     list_entries: list[ListEntry] = field(default_factory=list)
 
+
 @dataclass
 class RelationshipStrength:
     internal_id: int
     external_id: int
     strength: float
+
 
 @dataclass
 class Note:
@@ -158,10 +184,17 @@ class Note:
     content: str
     created_at: dt.datetime
     is_meeting: bool
+    updated_at: Optional[dt.datetime] = None
     mentioned_person_ids: list = field(default_factory=list)
     person_ids: list[int] = field(default_factory=list)
     organization_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list)
+    associated_person_ids: list[int] = field(default_factory=list)
+    interaction_person_ids: list[int] = field(default_factory=list)
+    interaction_id: Optional[int] = None
+    interaction_type: Optional[InteractionType] = None
+    type: Optional[NoteCreationType] = None
+
 
 @dataclass
 class EntityFile:
@@ -178,6 +211,7 @@ class EntityFile:
     opportunityId: Optional[int] = None # Duplicate in API response 
     createdAt: Optional[dt.datetime] = None # Duplicate in API repsonse
     uploaderId: Optional[int] = None # Duplicate in API response
+
 
 @dataclass
 class Reminder:
@@ -196,6 +230,7 @@ class Reminder:
     person: Optional[Person]
     organization: Optional[Organization]
     opportunity: Optional[Opportunity]
+
 
 @dataclass
 class Webhook:
