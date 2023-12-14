@@ -372,7 +372,7 @@ class Organizations(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
 
     def fields(self) -> dict:
-        self.endpoint = f"organizations/fields"
+        self.endpoint = "organizations/fields"
         return self._get(is_fields=True)
 
     # TODO: Impl min&max_{interaction_type}_date query params

@@ -150,7 +150,7 @@ class Organization:
 
 
 @dataclass_json
-@dataclass
+@dataclass(frozen=True)     # make the dataclasses immutable and hashable by freezing.
 class OrganizationFields:
     id: int
     name: str
