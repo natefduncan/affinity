@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import mimetypes
 import datetime as dt
 import io
 import requests as r
 from enum import Enum
 from dataclasses import asdict
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
 from affinity.common.constants import EntityType, InteractionType, ReminderResetType, ReminderType, ValueType
 from affinity.core import models
 
 BASE_URL = "https://api.affinity.co"
+
 
 class RequestType(Enum):
     GET = 1
@@ -17,6 +20,7 @@ class RequestType(Enum):
     CREATE =  3
     DELETE = 4
     UPDATE = 5
+
 
 class Endpoint:
     endpoint : str = ""
@@ -35,7 +39,7 @@ class Endpoint:
             if r not in params:
                 raise RequiredQueryParamMissing(r) 
 
-    def _get(self):
+    def _get(self, **kwargs):
         if not self.token:
             raise TokenMissing
         if RequestType.GET not in self.allowed_request_types:
@@ -44,9 +48,9 @@ class Endpoint:
         response = r.get(url=url, auth=("", self.token), allow_redirects=True)
         if response.status_code != 200:
             raise RequestFailed(response.content)
-        return self.parse_get(response)
+        return self.parse_get(response, **kwargs)
 
-    def parse_get(self, response: r.Response):
+    def parse_get(self, response: r.Response, **kwargs):
         # Assume 200 status code
         return response.json()
 
@@ -152,7 +156,8 @@ class Endpoint:
 
     def update(self, payload: dict = {}):
         return self._update(payload)
-    
+
+
 class Lists(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST]
     endpoint = "lists"
@@ -168,6 +173,7 @@ class Lists(Endpoint):
 
     def parse_list(self, response: r.Response) -> list[models.List]:
         return [models.List(**i) for i in response.json()]
+
 
 class ListEntries(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
@@ -205,6 +211,7 @@ class ListEntries(Endpoint):
        
     # Default parse delete
 
+
 class Fields(Endpoint):
     endpoint = "fields"
     allowed_request_types = [RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
@@ -229,7 +236,8 @@ class Fields(Endpoint):
         return self._delete()
 
     # Default parse delete
-    
+
+
 def parse_value(fields, field_value) -> models.Value:
     value = {k: None for k in ["person","organization","dropdown", "number", "date", "location", "text", "ranked_dropdown", "opportunity"]}
     field = next((f for f in fields if f.id == field_value['field_id']), None)
@@ -253,6 +261,7 @@ def parse_value(fields, field_value) -> models.Value:
         elif field.value_type == ValueType.opportunity:
             value["opportunity"] = field_value["value"]
     return models.Value(**value)
+
 
 class FieldValues(Endpoint):
     endpoint = "field-values"
@@ -312,6 +321,7 @@ class FieldValues(Endpoint):
 
     # Default parse delete
 
+
 class Persons(Endpoint):
     endpoint = "persons"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
@@ -356,9 +366,14 @@ class Persons(Endpoint):
 
     # Default parse update
 
+
 class Organizations(Endpoint):
     endpoint = "organizations"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
+
+    def fields(self) -> dict:
+        self.endpoint = f"organizations/fields"
+        return self._get(is_fields=True)
 
     # TODO: Impl min&max_{interaction_type}_date query params
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
@@ -376,7 +391,9 @@ class Organizations(Endpoint):
         self.endpoint = f"organizations/{organization_id}"
         return self._get()
 
-    def parse_get(self, response: r.Response) -> models.Organization:
+    def parse_get(self, response: r.Response, **kwargs) -> models.Organization | List[models.OrganizationFields]:
+        if kwargs.get('is_fields'):
+            return [models.OrganizationFields(**i) for i in response.json()]
         return models.Organization.from_dict(response.json())
 
     def create(self, name: str, domain: Optional[str] = None, person_ids: List[int] = []):
@@ -399,6 +416,7 @@ class Organizations(Endpoint):
         return self._update(payload)
 
     # Default parse update
+
 
 class Opportunities(Endpoint):
     endpoint = "opportunities"
@@ -443,6 +461,7 @@ class Opportunities(Endpoint):
 
     # Default parse update
 
+
 class Interactions(Endpoint):
     endpoint = "interactions"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE]
@@ -458,6 +477,7 @@ class Interactions(Endpoint):
             "next_page_token": data["next_page_token"]
         }
 
+
 class RelationshipsStrengths(Endpoint):
     endpoint = "relationships-strengths"
     allowed_request_types = [RequestType.LIST]
@@ -469,6 +489,7 @@ class RelationshipsStrengths(Endpoint):
 
     def parse_list(self, response: r.Response) -> List[models.RelationshipStrength]:
         return [models.RelationshipStrength(**i) for i in response.json()]
+
 
 class Notes(Endpoint):
     endpoint = "notes"
@@ -514,6 +535,7 @@ class Notes(Endpoint):
 
     # Default parse update
 
+
 class EntityFiles(Endpoint):
     endpoint = "entity-files"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE] 
@@ -553,6 +575,7 @@ class EntityFiles(Endpoint):
         return self._upload(files=files, form=payload)
 
     # Default parse create
+
 
 class Reminders(Endpoint):
     endpoint = "reminders"
@@ -604,6 +627,7 @@ class Reminders(Endpoint):
 
     # Default parse update
 
+
 class WhoAmI(Endpoint):
     endpoint = "auth/whoami"
     allowed_request_types = [RequestType.GET]
@@ -612,6 +636,7 @@ class WhoAmI(Endpoint):
         return self._get()
     
     # Default parse get
+
 
 class FieldValueChanges(Endpoint):
     endpoint = "field-value-changes"
@@ -629,6 +654,7 @@ class FieldValueChanges(Endpoint):
             fv.update({"value": value})
             fvs.append(models.FieldValueChange(**fv))
         return fvs
+
 
 class Webhooks(Endpoint):
     endpoint = "webhook"

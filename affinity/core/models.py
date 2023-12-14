@@ -13,7 +13,8 @@ from affinity.common.constants import (
     ReminderType,
     ReminderResetType,
     ReminderStatusType,
-    NoteCreationType
+    NoteCreationType,
+    ValueType,
 )
 
 
@@ -146,6 +147,19 @@ class Organization:
     person_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list) 
     list_entries: list[ListEntry] = field(default_factory=list)
+
+
+@dataclass_json
+@dataclass
+class OrganizationFields:
+    id: int
+    name: str
+    value_type: ValueType
+    enrichment_source: Optional[str]
+    list_id: Optional[int]
+    allows_multiple: bool
+    track_changes: bool
+    dropdown_options: list[DropdownOption]
 
 
 @dataclass
