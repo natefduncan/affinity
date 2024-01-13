@@ -394,9 +394,11 @@ class Organizations(Endpoint):
             "next_page_token" : data["next_page_token"]
         }
 
-    def get(self, organization_id: int):
+    def get(self, organization_id: int, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None):
         self.endpoint = f"organizations/{organization_id}"
-        return self._get(None)
+        query_params = {k: v for k, v in locals().items() if k not in ["self", "organization_id"] and v is not None}
+
+        return self._get(query_params=query_params)
 
     def parse_get(self, response: r.Response, **kwargs) -> models.Organization | List[models.OrganizationFields]:
         if kwargs.get('is_fields'):

@@ -145,9 +145,13 @@ class Organization:
     domains: list[str]
     crunchbase_uuid: Optional[str]
     global_: Optional[bool] = field(metadata=config(field_name="global"))
+    # global_: Optional[bool] = field(alias="global")
     person_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list) 
     list_entries: list[ListEntry] = field(default_factory=list)
+    interaction_dates: dict = field(default_factory=dict)
+    interactions: dict = field(default_factory=dict)
+
 
 
 @dataclass_json
