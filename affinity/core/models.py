@@ -116,6 +116,7 @@ class Person:
     list_entries: list[ListEntry] = field(default_factory=list) 
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
     interactions: Dict[str, ShortInteraction] = field(default_factory=dict)
+    current_organization_ids: list[int] = field(default_factory=list)
 
 
 #  https://api-docs.affinity.co/#the-field-value-change-resource

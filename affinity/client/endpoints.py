@@ -23,7 +23,7 @@ class RequestType(Enum):
 
 
 class Endpoint:
-    endpoint : str = ""
+    endpoint: str = ""
     allowed_request_types: List[RequestType] = []
     required_query_params: List[str] = []
     
@@ -39,12 +39,16 @@ class Endpoint:
             if r not in params:
                 raise RequiredQueryParamMissing(r) 
 
-    def _get(self, **kwargs):
+    def _get(self, query_params: Optional[dict] = None,  **kwargs):
+
+        query_params = query_params if query_params else {}
         if not self.token:
             raise TokenMissing
         if RequestType.GET not in self.allowed_request_types:
             raise RequestTypeNotAllowed
-        url = self.construct_url({})
+
+        self.verify_query_params(query_params)
+        url = self.construct_url(query_params)
         response = r.get(url=url, auth=("", self.token), allow_redirects=True)
         if response.status_code != 200:
             raise RequestFailed(response.content)
@@ -164,7 +168,7 @@ class Lists(Endpoint):
     
     def get(self, list_id: int):
         self.endpoint = f"lists/{list_id}"
-        return self._get()
+        return self._get(None)
  
     def parse_get(self, response: r.Response) -> models.List:
         return models.List(**response.json())
@@ -184,7 +188,7 @@ class ListEntries(Endpoint):
 
     def get(self, list_entry_id: int):
         self.endpoint = f"lists/{self.list_id}/list-entries/{list_entry_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.ListEntry:
         return models.ListEntry(**response.json())
@@ -338,9 +342,12 @@ class Persons(Endpoint):
             "next_page_token" : data["next_page_token"]
         }
 
-    def get(self, person_id: int):
+    def get(self, person_id: int,  with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, with_current_organizations: bool = None):
+
         self.endpoint = f"persons/{person_id}"
-        return self._get()
+
+        query_params = {k: v for k, v in locals().items() if k not in ["self", "person_id"] and v is not None}
+        return self._get(query_params=query_params)
 
     def parse_get(self, response: r.Response) -> models.Person:
         return models.Person(**response.json())
@@ -373,7 +380,7 @@ class Organizations(Endpoint):
 
     def fields(self) -> dict:
         self.endpoint = "organizations/fields"
-        return self._get(is_fields=True)
+        return self._get(None, is_fields=True)
 
     # TODO: Impl min&max_{interaction_type}_date query params
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
@@ -389,7 +396,7 @@ class Organizations(Endpoint):
 
     def get(self, organization_id: int):
         self.endpoint = f"organizations/{organization_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response, **kwargs) -> models.Organization | List[models.OrganizationFields]:
         if kwargs.get('is_fields'):
@@ -435,7 +442,7 @@ class Opportunities(Endpoint):
 
     def get(self, opportunity_id: int):
         self.endpoint = f"opportunities/{opportunity_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.Opportunity:
         return models.Opportunity(**response.json())
@@ -506,7 +513,7 @@ class Notes(Endpoint):
 
     def get(self, note_id: int):
         self.endpoint = f"notes/{note_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.Note:
         return models.Note(**response.json())
@@ -552,7 +559,7 @@ class EntityFiles(Endpoint):
 
     def get(self, entity_file_id: int):
         self.path = f"entity-files/{entity_file_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.EntityFile:
         data = response.json()["entity_files"][0] # API response is formatted strangely
@@ -592,7 +599,7 @@ class Reminders(Endpoint):
 
     def get(self, reminder_id: int):
         self.endpoint = f"reminders/{reminder_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.Reminder:
         return models.Reminder(**response.json())
@@ -633,7 +640,7 @@ class WhoAmI(Endpoint):
     allowed_request_types = [RequestType.GET]
 
     def get(self):
-        return self._get()
+        return self._get(None)
     
     # Default parse get
 
@@ -668,7 +675,7 @@ class Webhooks(Endpoint):
 
     def get(self, webhook_subscription_id: int):
         self.endpoint = f"webhook/{webhook_subscription_id}"
-        return self._get()
+        return self._get(None)
 
     def parse_get(self, response: r.Response) -> models.Webhook:
         return models.Webhook(**response.json())
