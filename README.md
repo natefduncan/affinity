@@ -1,8 +1,11 @@
+> ## Note: This is a fork of Nathan Duncan's `affinity` library. Since the original library is no longer maintained, I've forked it and added some additional functionality to the library as well as fixing some bugs. Use at your own risk.
+
 # Affinity
-Python library for Affinity CRM REST API
+Python library for Affinity CRM REST API v1.0
+> Note: Affinity is working on a new version of their API. This library is for the current version of the API (v1.0). It may be obsolete once the new version of the API is released.
 
 ## Installation
-`pip3 install affinity-crm`
+`pip install git+https://github.com/oneryalcin/affinity.git@main`
 
 ## Usage
 ```python
