@@ -1,8 +1,11 @@
+> ## Note: This is a fork of Nathan Duncan's `affinity` library. Since the original library is no longer maintained, I've forked it and added some additional functionality to the library as well as fixing some bugs. Use at your own risk.
+
 # Affinity
-Python library for Affinity CRM REST API
+Python library for Affinity CRM REST API v1.0
+> Note: Affinity is working on a new version of their API. This library is for the current version of the API (v1.0). It may be obsolete once the new version of the API is released.
 
 ## Installation
-`pip3 install affinity-crm`
+`pip install git+https://github.com/oneryalcin/affinity.git@main`
 
 ## Usage
 ```python
@@ -54,14 +57,15 @@ client.field_values().delete(field_value_id: int)
 
 # Persons
 client.persons().list(term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None)
-client.persons().get(person_id: int)
+client.persons().get(person_id: int, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, with_current_organizations: bool = None)
 client.persons().create(first_name: str, last_name: str, emails: List[str], organization_ids: List[int] = [])
 client.persons().update(person_id: int, first_name: Optional[str] = None, last_name: Optional[str] = None, emails: List[str] = [], organization_ids: List[int] = [])
 client.persons().delete(person_id: int)
 
 # Organizations
+client.organizations().fields()
 client.organizations().list(term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None)
-client.organizations().get(organization_id: int)
+client.organizations().get(organization_id: int, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None)
 client.organizations().create(name: str, domain: Optional[str] = None, person_ids: List[int] = [])
 client.organizations().update(organization_id: int, name: Optional[str] = None, domain: Optional[str] = None, person_ids: List[int] = [])
 client.organizations().delete(organization_id: int)

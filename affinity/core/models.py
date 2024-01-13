@@ -116,6 +116,7 @@ class Person:
     list_entries: list[ListEntry] = field(default_factory=list) 
     interaction_dates: Dict[str, dt.datetime] = field(default_factory=dict) 
     interactions: Dict[str, ShortInteraction] = field(default_factory=dict)
+    current_organization_ids: list[int] = field(default_factory=list)
 
 
 #  https://api-docs.affinity.co/#the-field-value-change-resource
@@ -144,13 +145,17 @@ class Organization:
     domains: list[str]
     crunchbase_uuid: Optional[str]
     global_: Optional[bool] = field(metadata=config(field_name="global"))
+    # global_: Optional[bool] = field(alias="global")
     person_ids: list[int] = field(default_factory=list)
     opportunity_ids: list[int] = field(default_factory=list) 
     list_entries: list[ListEntry] = field(default_factory=list)
+    interaction_dates: dict = field(default_factory=dict)
+    interactions: dict = field(default_factory=dict)
+
 
 
 @dataclass_json
-@dataclass
+@dataclass(frozen=True)     # make the dataclasses immutable and hashable by freezing.
 class OrganizationFields:
     id: int
     name: str
