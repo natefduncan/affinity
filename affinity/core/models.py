@@ -2,6 +2,8 @@ import datetime as dt
 from dataclasses_json import config, dataclass_json
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
+
+from marshmallow import fields
 from affinity.common.constants import (
     ListType,
     ActionType,
@@ -16,6 +18,7 @@ from affinity.common.constants import (
     NoteCreationType,
     ValueType,
 )
+
 
 
 #  https://api-docs.affinity.co/#fields
@@ -60,7 +63,13 @@ class ListEntry:
     creator_id: int
     entity_id: int
     entity_type: EntityType
-    created_at: dt.datetime
+    created_at: dt.datetime = field(
+        metadata=config(
+            encoder=dt.datetime.isoformat,
+            decoder=dt.datetime.fromisoformat,
+            mm_field=fields.DateTime(format="iso"),
+        )
+    )
     entity: Optional[Any] = None
 
 
