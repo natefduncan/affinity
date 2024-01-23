@@ -401,7 +401,7 @@ class Organizations(Endpoint):
 
         return self._get(query_params=query_params)
 
-    def get_by_domain(self, domain: str, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, with_people: Optional[bool] = None):
+    def get_by_domain(self, domain: str, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, with_people: Optional[bool] = True):
 
         # https://api.affinity.co/organizations?term=abaka.me
         query_params = {k: v for k, v in locals().items() if k not in ["self", "domain"] and v is not None}
