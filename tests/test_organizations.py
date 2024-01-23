@@ -24,3 +24,8 @@ def test_organizations_get_with_params(client):
     assert isinstance(one, models.Organization)
 
 
+def test_organizations_get_by_domain(client):
+    one = client.organizations().get_by_domain("affinity.co")
+    assert isinstance(one, models.Organization)
+
+

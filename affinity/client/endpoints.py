@@ -55,7 +55,8 @@ class Endpoint:
         return self.parse_get(response, **kwargs)
 
     def parse_get(self, response: r.Response, **kwargs):
-        # Assume 200 status code
+
+        response.raise_for_status()
         return response.json()
 
     def _download(self, save_path: str):
@@ -399,6 +400,20 @@ class Organizations(Endpoint):
         query_params = {k: v for k, v in locals().items() if k not in ["self", "organization_id"] and v is not None}
 
         return self._get(query_params=query_params)
+
+    def get_by_domain(self, domain: str, with_interaction_dates: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, with_people: Optional[bool] = None):
+
+        # https://api.affinity.co/organizations?term=abaka.me
+        query_params = {k: v for k, v in locals().items() if k not in ["self", "domain"] and v is not None}
+        query_params.update({"term": domain})
+        org_candidates = self._list(query_params=query_params).get('organizations')
+        if not org_candidates:
+            return None
+        for org in org_candidates:
+            if org.domain == domain:
+                if with_interaction_dates or with_interaction_persons or with_opportunities or with_people:
+                    return self.get(org.id, with_interaction_dates, with_interaction_persons, with_opportunities)
+                return org
 
     def parse_get(self, response: r.Response, **kwargs) -> models.Organization | List[models.OrganizationFields]:
         if kwargs.get('is_fields'):
