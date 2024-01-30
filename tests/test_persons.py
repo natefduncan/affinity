@@ -27,3 +27,9 @@ def test_persons_get_with_params(client):
     assert isinstance(person, models.Person)
 
 
+def test_persons_fields(client):
+    many = client.persons().fields()
+    assert isinstance(many[0], models.PersonFields)
+
+
+

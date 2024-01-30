@@ -176,6 +176,19 @@ class OrganizationFields:
     dropdown_options: list[DropdownOption]
 
 
+@dataclass_json
+@dataclass(frozen=True)     # make the dataclasses immutable and hashable by freezing.
+class PersonFields:
+    id: int
+    name: str
+    value_type: ValueType
+    enrichment_source: Optional[str]
+    list_id: Optional[int]
+    allows_multiple: bool
+    track_changes: bool
+    dropdown_options: list[DropdownOption]
+
+
 @dataclass
 class EmailInteraction:
     date: dt.datetime
@@ -265,4 +278,6 @@ class Webhook:
     id: int
     webhook_url: str
     subscriptions: list[str]
+    created_by: int
+    updated_at: dt.datetime
     disabled: bool

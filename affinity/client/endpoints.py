@@ -331,6 +331,10 @@ class Persons(Endpoint):
     endpoint = "persons"
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
 
+    def fields(self) -> dict:
+        self.endpoint = "persons/fields"
+        return self._get(None, is_fields=True)
+
     # TODO: Impl min&max_{interaction_type}_date query parms
     def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_current_organizations: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
         query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
@@ -350,7 +354,9 @@ class Persons(Endpoint):
         query_params = {k: v for k, v in locals().items() if k not in ["self", "person_id"] and v is not None}
         return self._get(query_params=query_params)
 
-    def parse_get(self, response: r.Response) -> models.Person:
+    def parse_get(self, response: r.Response, **kwargs) -> models.Person | List[models.PersonFields]:
+        if kwargs.get('is_fields'):
+            return [models.PersonFields(**i) for i in response.json()]
         return models.Person(**response.json())
  
     def create(self, first_name: str, last_name: str, emails: List[str], organization_ids: List[int] = []):
