@@ -6,7 +6,15 @@ import io
 import requests as r
 from enum import Enum
 from dataclasses import asdict
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
+
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)
+
 from affinity.common.exceptions import TokenMissing, RequestTypeNotAllowed, RequestFailed, RequiredPayloadFieldMissing, RequiredQueryParamMissing, ClientError
 from affinity.common.constants import EntityType, InteractionType, ReminderResetType, ReminderType, ValueType
 from affinity.core import models
@@ -37,8 +45,9 @@ class Endpoint:
     def verify_query_params(self, params: dict):
         for r in self.required_query_params:
             if r not in params:
-                raise RequiredQueryParamMissing(r) 
+                raise RequiredQueryParamMissing(r)
 
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(5))
     def _get(self, query_params: Optional[dict] = None,  **kwargs):
 
         query_params = query_params if query_params else {}
@@ -59,6 +68,7 @@ class Endpoint:
         response.raise_for_status()
         return response.json()
 
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(5))
     def _download(self, save_path: str):
         if not self.token:
             raise TokenMissing
@@ -75,6 +85,7 @@ class Endpoint:
         with open(save_path, "wb") as file:
             file.write(response.content)
 
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(5))
     def _list(self, query_params: dict):
         if not self.token:
             raise TokenMissing
