@@ -332,7 +332,7 @@ class Persons(Endpoint):
     allowed_request_types = [RequestType.GET, RequestType.LIST, RequestType.CREATE, RequestType.DELETE, RequestType.UPDATE]
 
     # TODO: Impl min&max_{interaction_type}_date query parms
-    def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_current_organizations: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
+    def list(self, term: Optional[str] = None, with_interaction_dates: Optional[bool] = None, with_current_organizations: Optional[bool] = None, with_interaction_persons: Optional[bool] = None, with_opportunities: Optional[bool] = None, page_size: Optional[int] = None, page_token: Optional[str] = None):
         query_params = {k: v for k,v in locals().items() if k != "self" and v != None}
         return self._list(query_params=query_params)
 
