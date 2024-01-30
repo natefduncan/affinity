@@ -18,12 +18,11 @@ def test_persons_get_with_params(client):
         persons["persons"][0].id,
         with_interaction_dates=True,
         with_opportunities=True,
-        with_interaction_persons=True,
-        with_current_organizations=True
+        with_current_organizations=True,
     )
-
-    assert person.interaction_dates is not None
-    assert person.interactions is not None
+    assert person.current_organization_ids is not None and len(person.current_organization_ids) > 0
+    assert person.interaction_dates is not None and len(person.interaction_dates) > 0
+    assert person.interactions is not None and  len(person.interactions) > 0
     assert isinstance(person, models.Person)
 
 
