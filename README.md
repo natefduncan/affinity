@@ -24,7 +24,7 @@ client.persons().list()
 - [x] [Persons](https://api-docs.affinity.co/#persons)
 - [x] [Organizations](https://api-docs.affinity.co/#organizations) 
 - [x] [Opportunities](https://api-docs.affinity.co/#opportunities)
-- [ ] [Interactions](https://api-docs.affinity.co/#interactions) 
+- [x] [Interactions](https://api-docs.affinity.co/#interactions) 
 - [x] [Relationship Strengths](https://api-docs.affinity.co/#relationship-strengths)
 - [x] [Notes](https://api-docs.affinity.co/#notes)
 - [x] [Entity Files](https://api-docs.affinity.co/#entity-files)
@@ -78,6 +78,9 @@ client.opportunities().get(opportunity_id: int)
 client.opportunities().create(name: str, list_id: int, person_ids: List[int] = [], organization_ids: List[int] = [])
 client.opportunities().update(opportunity_id: int, name: Optional[str], person_ids: List[int] = [], organization_ids: List[int] = [])
 client.opportunities().delete(opportunity_id: int)
+
+# Interactions (Only Meeting type is currently supported)
+client.interactions(type: InteractionType).list(start_time: datetime.datetime, end_time: datetime.datetime, person_id: Optional[int] = None, organization_id: Optional[int] = None, page_token: Optional[str] = None)
 
 # Relationship Strength
 client.relationships_strengths().list(external_id: int, internal_id: Optional[int] = None)

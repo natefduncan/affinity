@@ -201,6 +201,23 @@ class EmailInteraction:
     direction: DirectionType
 
 
+@dataclass_json
+@dataclass(frozen=True)
+class MeetingInteraction:
+    id: int
+    date: dt.datetime
+    attendees: list
+    start_time: dt.datetime
+    end_time: dt.datetime
+    updated_at: dt.datetime
+    type: InteractionType
+    title: str
+    persons: list[Person]
+    ical_uid: Optional[str] = None
+    notes: list = field(default_factory=list)
+    manual_creator_id: Optional[int] = field(default=None)
+
+
 @dataclass
 class Opportunity:
     id: int

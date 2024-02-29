@@ -563,10 +563,29 @@ class Interactions(Endpoint):
 
     def parse_list(self, response: r.Response) -> dict:
         data = response.json()
-        return {
-            "emails": [models.EmailInteraction.from_dict(i) for i in data["emails"]],
-            "next_page_token": data["next_page_token"]
-        }
+
+        if self.type == InteractionType.meeting:
+            return {
+                "interactions": [models.MeetingInteraction(**i) for i in data["events"]],
+                "next_page_token": data["next_page_token"]
+            }
+        elif self.type in (InteractionType.email, InteractionType.call, InteractionType.chat_message):
+            raise NotImplementedError("This type of interaction has not yet implemented in SDK")
+
+    def list(
+            self,
+            start_time: dt.datetime = dt.datetime.now() - dt.timedelta(days=3560),    # 10 years roughly
+            end_time: dt.datetime = dt.datetime.now() + dt.timedelta(days=365),      # 1 year roughly
+            person_id: Optional[int] = None,
+            organization_id: Optional[int] = None,
+    ):
+        if not person_id and not organization_id:
+            raise RequiredQueryParamMissing("Must have either person_id or organization_id")
+
+        _locals = locals().copy()
+        _locals.update({'type': self.type.value})
+        query_params = {k: v for k, v in _locals.items() if k != "self" and v != None}
+        return self._list(query_params=query_params)
 
 
 class RelationshipsStrengths(Endpoint):
