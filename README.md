@@ -79,7 +79,7 @@ client.opportunities().create(name: str, list_id: int, person_ids: List[int] = [
 client.opportunities().update(opportunity_id: int, name: Optional[str], person_ids: List[int] = [], organization_ids: List[int] = [])
 client.opportunities().delete(opportunity_id: int)
 
-# Interactions (Only Meeting type is currently supported)
+# Interactions (Only Meeting and Email types supported currently)
 client.interactions(type: InteractionType).list(start_time: datetime.datetime, end_time: datetime.datetime, person_id: Optional[int] = None, organization_id: Optional[int] = None, page_token: Optional[str] = None)
 
 # Relationship Strength

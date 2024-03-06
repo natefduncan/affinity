@@ -189,13 +189,15 @@ class PersonFields:
     dropdown_options: list[DropdownOption]
 
 
+@dataclass_json
 @dataclass
 class EmailInteraction:
     date: dt.datetime
     id: int
     subject: str
     type: InteractionType
-    from_: Person = field(metadata=config(field_name="from"))
+    # from_: Person = field(metadata=config(field_name="from"))
+    from_: Person
     to: list[Person] 
     cc: list[Person]
     direction: DirectionType

@@ -561,6 +561,14 @@ class Interactions(Endpoint):
         self.type = type
         super().__init__(token)
 
+    @staticmethod
+    def _adjust_from_data(data):
+        for entry in data:
+            # Rename 'from' key to 'from_'
+            if 'from' in entry:
+                entry['from_'] = entry.pop('from')
+        return data
+
     def parse_list(self, response: r.Response) -> dict:
         data = response.json()
 
@@ -569,7 +577,14 @@ class Interactions(Endpoint):
                 "interactions": [models.MeetingInteraction(**i) for i in data["events"]],
                 "next_page_token": data["next_page_token"]
             }
-        elif self.type in (InteractionType.email, InteractionType.call, InteractionType.chat_message):
+
+        elif self.type == InteractionType.email:
+            return {
+                "interactions": [models.EmailInteraction(**i) for i in self._adjust_from_data(data["emails"])],
+                "next_page_token": data["next_page_token"]
+            }
+
+        elif self.type in (InteractionType.call, InteractionType.chat_message):
             raise NotImplementedError("This type of interaction has not yet implemented in SDK")
 
     def list(
